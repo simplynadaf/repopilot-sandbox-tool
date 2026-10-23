@@ -28,37 +28,35 @@ async function flip(page, sel, after = 2800) {
   });
   const page = await context.newPage();
 
-  // --- NEW demo: the before/after story ---
+  // --- NEW demo: the before/after story (holds timed to the Polly VO segments) ---
   await page.goto(NEW_URL, { waitUntil: 'load' });
-  await hold(page, 3400);                                  // header reads (hook VO)
+  await hold(page, 3200);                                  // header while intro card tail + hook VO opens
 
-  // Start: Before/v1 + Safe repo (default). Hold so "reads it" lands.
-  await hold(page, 2600);
+  // Start: Before/v1 + Safe repo (default). hook VO (~11s) plays over header+this.
+  await hold(page, 8200);
 
-  // 0:28 switch repo to Sneaky, still v1 -> "Looks fine" (the gap)
-  await flip(page, 'button[data-repo="bad"]', 3400);
+  // v1 sneaky -> "Looks fine" (gap VO ~9.7s)
+  await flip(page, 'button[data-repo="bad"]', 9800);
 
-  // 0:50 flip to After/v2, still Sneaky -> real log + caught curl|bash (payoff)
-  await flip(page, 'button[data-ver="v2"]', 5200);         // long hold: this is the money shot
+  // v2 sneaky -> real log + caught curl|bash (payoff VO ~13s). money shot: long hold.
+  await flip(page, 'button[data-ver="v2"]', 13200);
 
-  // 1:25 switch repo to Safe, still v2 -> clean SUCCEEDED (balance)
-  await flip(page, 'button[data-repo="good"]', 4200);
+  // v2 safe -> clean SUCCEEDED (safe VO ~8.5s)
+  await flip(page, 'button[data-repo="good"]', 8800);
 
-  // small settle
-  await hold(page, 1600);
+  await hold(page, 1400);
 
-  // --- OLD RepoPilot UI (the agent I already built) ---
+  // --- OLD RepoPilot UI (close VO ~28s spans this + the return) ---
   await page.goto(OLD_URL, { waitUntil: 'domcontentloaded' }).catch(() => {});
-  await hold(page, 5200);                                  // show the original reads-it UI
-  // gentle scroll to show it is a real app
+  await hold(page, 7000);                                  // show the original reads-it UI
   await page.evaluate(() => window.scrollBy({ top: 420, behavior: 'smooth' })).catch(() => {});
-  await hold(page, 3000);
+  await hold(page, 5000);
 
-  // --- back to the new demo for the close ---
+  // --- back to the new demo for the close; end on caught danger ---
   await page.goto(NEW_URL, { waitUntil: 'load' });
-  await flip(page, 'button[data-ver="v2"]', 1200);
-  await flip(page, 'button[data-repo="bad"]', 4200);       // end on the caught-danger frame
-  await hold(page, 2000);
+  await flip(page, 'button[data-ver="v2"]', 1000);
+  await flip(page, 'button[data-repo="bad"]', 9000);       // end on the caught-danger frame
+  await hold(page, 2500);
 
   await context.close();
   await browser.close();
