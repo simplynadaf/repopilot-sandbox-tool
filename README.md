@@ -114,7 +114,7 @@ The challenge asks you to show what your agent can do now that it could not befo
 demo makes that a single toggle: **v1 (reads it)** vs **v2 (runs it)**, on a safe repo and a
 sneaky one.
 
-| Scenario | v1 — Before (reads it) | v2 — After (runs it in the sandbox) |
+| Scenario | v1 · Before (reads it) | v2 · After (runs it in the sandbox) |
 |---|---|---|
 | **Safe repo** (`pallets/click`) | "Looks safe. README and manifest agree." | **Ran it. Install SUCCEEDED. No danger in the live log.** |
 | **Sneaky `postinstall`** | "Looks fine." (the hook is invisible to a reader) | **⚠ Caught it: the install piped `curl ... \| bash` straight into a shell, seen in the real build log.** |
