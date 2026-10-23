@@ -99,6 +99,19 @@ export REPOPILOT_SANDBOX_PROJECT=repopilot-sandbox      # the live CodeBuild pro
 - The CodeBuild project + IAM role are LIVE in account 175662053988 / us-east-1. When fully
   done, run scripts/teardown_sandbox.sh to remove them (cost is pennies; fine to leave over one night).
 
+## DELIVERABLES THE USER WANTS (authoritative checklist, keep in mind always)
+1. [~] YouTube DEMO VIDEO            -> recorded; voiceover+stitch+upload remain
+2. [ ] YouTube METADATA              -> title/description/tags/chapters (docs/YOUTUBE-METADATA.md)
+3. [ ] DEV.TO ARTICLE               -> syndication, canonical to sarvarnadaf.com (docs/DEVTO-ARTICLE.md)
+4. [x] PROJECT (Builder Center form) -> docs/SUBMIT-01-project.txt (add YouTube link after video)
+5. [x] POST (challenge space)        -> docs/SUBMIT-02-post.txt (add YouTube link after video)
+6. [ ] PROMOTION posts               -> LinkedIn (Unicode bold, link in 1st comment) + X thread
+                                        (docs/promo/ via article-promotion skill)
+7. [x] THUMBNAIL 1280x720            -> docs/thumbnail.png
+8. [x] COVER IMAGE 1200x675          -> docs/banner.png
+After the video exists: put the YouTube URL into README, ARTICLE.md, DEVTO-ARTICLE.md,
+SUBMIT-01-project.txt, SUBMIT-02-post.txt, YOUTUBE-METADATA.md, and the promo posts.
+
 ## STATE SNAPSHOT (end of 2026-10-23, evening session 2)
 WORKING DIR: ~/weekend-hackathon/build/repopilot-sandbox  (git, pushed to GitHub, main)
 
