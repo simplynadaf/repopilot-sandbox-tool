@@ -100,17 +100,29 @@ export REPOPILOT_SANDBOX_PROJECT=repopilot-sandbox      # the live CodeBuild pro
   done, run scripts/teardown_sandbox.sh to remove them (cost is pennies; fine to leave over one night).
 
 ## DELIVERABLES THE USER WANTS (authoritative checklist, keep in mind always)
-1. [~] YouTube DEMO VIDEO            -> recorded; voiceover+stitch+upload remain
-2. [ ] YouTube METADATA              -> title/description/tags/chapters (docs/YOUTUBE-METADATA.md)
-3. [ ] DEV.TO ARTICLE               -> syndication, canonical to sarvarnadaf.com (docs/DEVTO-ARTICLE.md)
-4. [x] PROJECT (Builder Center form) -> docs/SUBMIT-01-project.txt (add YouTube link after video)
-5. [x] POST (challenge space)        -> docs/SUBMIT-02-post.txt (add YouTube link after video)
+1. [x] YouTube DEMO VIDEO            -> RENDERED. docs/demo.mp4 (1:30, 1920x1080, 6.6MB, <3min).
+                                        Polly Matthew VO + ambient bed + loudnorm. Shows OLD
+                                        RepoPilot UI + NEW toggle (v1 reads -> v2 runs ->
+                                        catches curl|bash -> safe -> old UI -> close). QA'd:
+                                        speech -17..-20dB in every window; frames correct.
+                                        Also at ~/repopilot-sandbox-rec/final/ + in S3.
+                                        LEFT: upload to YouTube (needs user account).
+2. [x] YouTube METADATA              -> docs/YOUTUBE-METADATA.md (title 82ch, desc, tags,
+                                        chapters, A/B title, AI-voice disclosure note).
+3. [x] DEV.TO ARTICLE               -> docs/DEVTO-ARTICLE.md (front-matter, canonical, 4 tags,
+                                        {% embed %} repo, code block). Hard rules pass.
+4. [x] PROJECT (Builder Center form) -> docs/SUBMIT-01-project.txt (title 85, desc 306, tags,
+                                        cover=banner.png, repo, demo). Ready to paste.
+5. [x] POST (challenge space)        -> docs/SUBMIT-02-post.txt (title 104/150, body). Ready.
 6. [ ] PROMOTION posts               -> LinkedIn (Unicode bold, link in 1st comment) + X thread
-                                        (docs/promo/ via article-promotion skill)
+                                        (docs/promo/). NOT DONE YET. Next up.
 7. [x] THUMBNAIL 1280x720            -> docs/thumbnail.png
 8. [x] COVER IMAGE 1200x675          -> docs/banner.png
-After the video exists: put the YouTube URL into README, ARTICLE.md, DEVTO-ARTICLE.md,
-SUBMIT-01-project.txt, SUBMIT-02-post.txt, YOUTUBE-METADATA.md, and the promo posts.
+
+ONE STEP THAT NEEDS THE USER: upload docs/demo.mp4 to YouTube (metadata ready). Once we have
+the URL, inject it into: README.md, docs/ARTICLE.md, docs/DEVTO-ARTICLE.md,
+docs/SUBMIT-01-project.txt, docs/SUBMIT-02-post.txt, docs/YOUTUBE-METADATA.md, docs/promo/*.
+Then: submit the Builder Center project + post, publish Dev.to (canonical), post promo.
 
 ## STATE SNAPSHOT (end of 2026-10-23, evening session 2)
 WORKING DIR: ~/weekend-hackathon/build/repopilot-sandbox  (git, pushed to GitHub, main)
@@ -137,26 +149,28 @@ OLD vs NEW links (for the judges, both live):
 - OLD RepoPilot repo: https://github.com/simplynadaf/repopilot-your-first-run-agent
 - NEW demo + repo: the two URLs above.
 
-DEMO VIDEO (recording stage DONE, voiceover+stitch is the only big thing left):
-- docs/DEMO_SCRIPT.md: shot list + VO, shows OLD UI + NEW toggle, target ~2:15.
-- Cards recorded: ~/repopilot-sandbox-rec/cards/intro/*.webm + outro/*.webm (GSAP, gold/black).
-- Main demo recorded: ~/repopilot-sandbox-rec/demo/*.webm (43s). QA frames confirm the full arc:
-  v1 safe -> v1 sneaky "looks fine" -> v2 sneaky CATCHES curl|bash -> v2 safe clean ->
-  OLD RepoPilot UI live -> ends on caught-danger frame. GOOD.
-- Recorders: docs/record_cards.js, docs/record_demo.js (NODE_PATH=~/repopilot-recording/node_modules,
-  chromium-1248). Serve demo for re-records: (cd docs && python3 -m http.server 8099).
+DEMO VIDEO (DONE and verified):
+- docs/demo.mp4: FINAL 1:30, 1920x1080, H.264+AAC, 6.6MB (<3min). Intro card -> old-vs-new
+  walkthrough (v1 safe -> v1 sneaky "looks fine" -> v2 sneaky CATCHES curl|bash -> v2 safe
+  clean -> OLD RepoPilot UI live -> close on caught danger) -> outro card. Polly Matthew VO
+  (hook/gap/payoff/safe/close) placed with adelay + quiet sine ambient bed, loudnorm I=-16.
+  QA: speech -17..-20dB each window; payoff + close frames confirmed correct.
+  Sources: ~/repopilot-sandbox-rec/ (cards/, demo/, voiceover/, final/). S3 backup done.
+- DEMO_SCRIPT.md (shot list + VO), card-intro.html, card-outro.html, record_cards.js,
+  record_demo.js (holds re-timed to the VO). Serve to re-record: (cd docs && python3 -m http.server 8099).
+- ONLY LEFT: upload docs/demo.mp4 to YouTube (metadata ready in docs/YOUTUBE-METADATA.md).
 
 DEADLINE: Monday Oct 26, 1:00 PM PT (8:00 PM UTC). ~2.5 days left. On track.
 
 ## NEXT (in order) when we resume
-1. Finish the video: Polly Matthew VO per DEMO_SCRIPT cues -> ambient sine bed -> mux ->
-   loudnorm I=-16 -> concat intro + demo + outro -> MP4. Re-time demo holds (43s) OR tighten
-   VO to fit ~2:15. Copy the ffmpeg steps from the youtube-recording skill AI-voiceover section.
-2. Upload to YouTube (title from NAMING-AND-TITLES.md); add the URL to README + docs/ARTICLE.md.
-3. Fill the Builder Center form from docs/ARTICLE.md fields block + submit with the video link.
-4. Optional: Dev.to syndication (canonical to sarvarnadaf.com), promo posts (LinkedIn/X).
-5. When fully submitted: run scripts/teardown_sandbox.sh (removes the CodeBuild project + role;
-   cost is pennies, fine to leave until then).
+1. Write PROMOTION posts: LinkedIn (Unicode bold via ~/tools/linkedin-poster/tools/bold.py,
+   link in first comment) + X thread. Save to docs/promo/. (video/images already exist.)
+2. Upload docs/demo.mp4 to YouTube (needs user account; metadata in docs/YOUTUBE-METADATA.md).
+3. Inject the YouTube URL everywhere: README.md, docs/ARTICLE.md, docs/DEVTO-ARTICLE.md,
+   docs/SUBMIT-01-project.txt, docs/SUBMIT-02-post.txt, docs/YOUTUBE-METADATA.md, docs/promo/*.
+4. Submit the Builder Center PROJECT (SUBMIT-01) + POST (SUBMIT-02). Publish Dev.to (canonical).
+   Post the promo.
+5. When fully submitted: run scripts/teardown_sandbox.sh (removes CodeBuild project + role).
 
 ## How to resume
 `cd ~/weekend-hackathon/build/repopilot-sandbox && source ~/agent-experiance/.venv/bin/activate`
