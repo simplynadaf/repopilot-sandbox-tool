@@ -39,26 +39,28 @@ Original (published, do not resubmit): ~/builder-center-challenge/repopilot  and
       danger. Verified in browser, 0 console errors. THE CENTERPIECE.
 
 ## TODO (next session, in order)
-Steps 1-4 of the original plan are DONE (see the [x] items above). Remaining:
+Steps 1-4 of the original plan are DONE. README/Pages/repo/article/thumbnail/banner DONE
+this session (2026-10-23 evening). Remaining:
 
-1. [ ] README.md for the new repo (tool-first, before/after, the "runs it vs scans it" hook,
-       locked titles from NAMING-AND-TITLES.md, how-to-run, the SuspicionGate-style reusable
-       note for run_in_sandbox). Style like the checkpoint/RepoPilot READMEs. `---` separators.
-2. [ ] Enable GitHub Pages for the $0 static demo (docs/index.html already works standalone;
-       it uses inline DATA, no live calls). New repo: repopilot-sandbox-tool.
-3. [ ] AI-voiceover before/after demo video (<3 min) via youtube-recording skill:
-       record the toggle UI (v1 reads -> v2 runs -> Sneaky repo catches curl|bash), Polly
-       Matthew narration, intro/outro cards, loudness-normalize. Trim any dead air.
-4. [ ] Articles: Builder Center submission (ARTICLE.md) + optional Dev.to (DEVTO-ARTICLE.md).
-       Use the locked titles. Mention the challenge, embed repo + live demo + YouTube. Run the
-       writing-craft checks (0 em dashes, `---` separators, no AI tells, 4 tags).
-5. [ ] Thumbnail (1280x720) + Builder Center cover banner (1200x675) + social banner, same
-       gold/black theme. Reuse the checkpoint generators as templates.
-6. [ ] Create NEW public GitHub repo `simplynadaf/repopilot-sandbox-tool`, push. S3 backup to
-       s3://sarvars-youtube-videos/repopilot-sandbox-tool/.
-7. [ ] Fill the Builder Center project form (field-by-field guide like the checkpoint one):
-       title/description/body/tags/repo/demo-video. Submit with the demo video link.
-8. [ ] Promo posts (LinkedIn Unicode bold + link in first comment, X thread, Slack).
+1. [x] README.md (advanced, 2387 words, 17 sections, before/after headline, run-vs-scan table,
+       threat model, reusable pattern, proof, honest take, FAQ). 0 em dashes. Committed+pushed.
+2. [x] New PUBLIC repo LIVE: github.com/simplynadaf/repopilot-sandbox-tool (pushed, main).
+3. [x] GitHub Pages LIVE + verified: https://simplynadaf.github.io/repopilot-sandbox-tool/
+       (the before/after toggle demo, served from /docs, $0, static replay).
+4. [x] Thumbnail docs/thumbnail.png (1280x720, "Stop scanning. Run it." + before/after chips).
+       Builder Center cover docs/banner.png (1200x675, repo->sandbox->verdict flow, minimal text).
+       Both under 2MB. Committed+pushed.
+5. [x] Builder Center ARTICLE: docs/ARTICLE.md (fields block up top: title/desc/tags/cover, then
+       ~1250-word body). Passes all hard rules (0 em dashes, no AI tells, `---` separators).
+6. [ ] AI-voiceover before/after demo video (<3 min) via youtube-recording skill: record the
+       toggle UI (v1 reads -> v2 runs -> Sneaky repo catches curl|bash), Polly Matthew narration,
+       intro/outro cards, loudness-normalize, trim dead air. THEN add YouTube URL to README +
+       ARTICLE links. THE main remaining media piece.
+7. [ ] Optional Dev.to syndication (DEVTO-ARTICLE.md) with canonical_url.
+8. [ ] S3 backup to s3://sarvars-youtube-videos/repopilot-sandbox-tool/ (repo + article + images).
+9. [ ] Fill the Builder Center project form from docs/ARTICLE.md fields block + submit with the
+       demo video link.
+10.[ ] Promo posts (LinkedIn Unicode bold + link in first comment, X thread).
 
 ## OPEN DECISION (resolve first tomorrow)
 "Previously unpublished project": our RepoPilot is already published. We are framing THIS as a
