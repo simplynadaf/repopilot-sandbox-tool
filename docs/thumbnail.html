@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+*{margin:0;box-sizing:border-box}
+.card{width:1280px;height:720px;position:relative;overflow:hidden;font-family:'Inter',sans-serif;
+  background:radial-gradient(900px 560px at 84% -8%,rgba(59,111,224,.3),transparent 60%),
+    radial-gradient(760px 520px at 4% 112%,rgba(217,178,91,.26),transparent 62%),
+    linear-gradient(160deg,#080a11,#06070b 55%,#04050a);}
+.vig{position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 0%,transparent 52%,rgba(0,0,0,.6))}
+.grain{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:absolute;inset:0;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;z-index:3}
+.kick{font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:.42em;text-transform:uppercase;color:#d9b25b}
+.badges{display:flex;gap:12px;margin-top:18px}
+.b{font-family:'JetBrains Mono',monospace;font-size:15px;color:#f3d998;border:1px solid rgba(217,178,91,.34);background:rgba(217,178,91,.08);padding:7px 15px;border-radius:999px}
+h1{font-family:'Playfair Display',serif;color:#eef1f7;font-weight:700;font-size:82px;line-height:.98;letter-spacing:-.5px;margin-top:8px}
+h1 .g{font-style:italic;background:linear-gradient(100deg,#f3d998,#d9b25b 48%,#b98f3e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:#9aa3b5;font-size:25px;max-width:760px;margin-top:20px;line-height:1.4}
+.sub b{color:#eef1f7;font-weight:700}
+/* the before/after chip row */
+.ba{display:flex;align-items:stretch;gap:0;margin-top:30px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.1);max-width:900px;box-shadow:0 30px 60px -28px rgba(0,0,0,.8)}
+.col{flex:1;padding:20px 24px;background:linear-gradient(180deg,rgba(10,12,18,.9),rgba(6,7,12,.95))}
+.col.after{background:linear-gradient(180deg,rgba(226,72,74,.12),rgba(10,12,18,.95));border-left:1px solid rgba(255,255,255,.1)}
+.lab{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#9aa3b5}
+.col.after .lab{color:#f0a73a}
+.msg{font-size:21px;font-weight:700;color:#eef1f7;margin-top:8px}
+.ev{font-family:'JetBrains Mono',monospace;font-size:14px;color:#e2484a;margin-top:7px}
+.okln{font-family:'JetBrains Mono',monospace;font-size:14px;color:#2fd27a;margin-top:7px}
+.foot{display:flex;align-items:center;justify-content:space-between}
+.by{color:#9aa3b5;font-size:17px}.by b{color:#f3d998;font-family:'Playfair Display',serif;font-style:italic;font-weight:700}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .ic{width:44px;height:44px;border-radius:11px;background:linear-gradient(160deg,#121523,#0a0c15);border:1px solid rgba(217,178,91,.3);display:flex;align-items:center;justify-content:center;color:#d9b25b;font-size:22px}
+</style></head>
+<body>
+<div class="card">
+  <div class="vig"></div><div class="grain"></div>
+  <div class="wrap">
+    <div>
+      <div class="kick">◈ I gave my agent a tool ◈</div>
+      <h1>Stop scanning.<br/><span class="g">Run it.</span></h1>
+      <div class="sub">My agent used to <b>read</b> a GitHub repo. Now it <b>runs the install in a disposable AWS sandbox</b> and catches what a scan misses.</div>
+      <div class="ba">
+        <div class="col"><div class="lab">Before · reads it</div><div class="msg">"Looks fine."</div><div class="okln">postinstall hook invisible</div></div>
+        <div class="col after"><div class="lab">After · runs it</div><div class="msg">Caught it.</div><div class="ev">curl … | bash</div></div>
+      </div>
+    </div>
+    <div class="foot">
+      <div class="logo"><div class="ic">🧪</div><div class="by"><b>Sarvar Nadaf</b> · sarvarnadaf.com</div></div>
+      <div class="badges"><span class="b">AWS CodeBuild</span><span class="b">Bedrock</span><span class="b">Strands</span></div>
+    </div>
+  </div>
+</div>
+</body></html>
