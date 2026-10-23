@@ -361,7 +361,7 @@ No. It is a static replay of real recorded runs, so it makes zero AWS calls.
 ## 🔗 Links
 
 - ▶️ Demo video: _YouTube URL (added on publish)_
-- 🖥️ Live before/after toggle: _GitHub Pages URL (added on publish)_
+- 🖥️ Live before/after toggle: https://simplynadaf.github.io/repopilot-sandbox-tool/
 
 ---
 
