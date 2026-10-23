@@ -12,7 +12,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-A855F7)](LICENSE)
 
 [![Watch the demo](https://img.shields.io/badge/▶%20Watch%20the%20demo-FF0000?logo=youtube&logoColor=white)](#-links)
-[![Live demo](https://img.shields.io/badge/🖥%20Live%20before%2Fafter%20toggle-8b7cff)](#-links)
+[![Live demo](https://img.shields.io/badge/🖥%20Live%20before%2Fafter%20toggle-8b7cff)](https://simplynadaf.github.io/repopilot-sandbox-tool/)
 
 **🏗️ Built for the [AWS Builder Center Weekend Challenge: Give your Agent a Tool](https://builder.aws.com/build/hackathons/2e275689-b202-316e-93b8-10cd6d6d1e4a/weekend-challenge-give-your-agent-a-tool)**
 
