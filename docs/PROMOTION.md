@@ -1,7 +1,7 @@
 ================================================================================
 PROMOTION  -  RepoPilot sandbox tool  (AWS Builder Center weekend challenge)
 ================================================================================
-Fill YOUTUBE_URL after upload, then post. Hard rules: 0 em dashes. Link in first
+Video is live. Post in the order below. Hard rules: 0 em dashes. Link in first
 comment on LinkedIn (the algorithm suppresses posts with outbound links in the body).
 ================================================================================
 
@@ -42,7 +42,7 @@ Code, a live demo, and a 2 minute before-and-after video in the first comment.
 #AWS #AIAgents #CodeBuild #Bedrock #SupplyChainSecurity #DevOps
 
 --- FIRST COMMENT (post immediately after) ---
-Demo video: YOUTUBE_URL
+Demo video: https://youtu.be/cLT6oyAnO04
 Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
 Code: https://github.com/simplynadaf/repopilot-sandbox-tool
 
@@ -88,7 +88,7 @@ Everyone scans the repo. This agent runs it, so your laptop does not.
 
 Built for the AWS Builder Center weekend challenge.
 
-Demo: YOUTUBE_URL
+Demo: https://youtu.be/cLT6oyAnO04
 Live: https://simplynadaf.github.io/repopilot-sandbox-tool/
 Code: https://github.com/simplynadaf/repopilot-sandbox-tool
 
@@ -99,7 +99,7 @@ YOUTUBE COMMUNITY / SHORT POST
 New video: I gave my AI agent one new tool, a disposable AWS sandbox that actually
 runs a repo instead of just reading it. It caught a postinstall piping curl into
 bash that a static scan would miss. Full before and after in the video.
-YOUTUBE_URL
+https://youtu.be/cLT6oyAnO04
 
 
 --------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ Project + video linked on the submission.
 ================================================================================
 POSTING ORDER (after YouTube upload + URL injected)
 ================================================================================
-1. Upload video to YouTube -> copy URL -> replace YOUTUBE_URL everywhere above.
+1. Video is live: https://youtu.be/cLT6oyAnO04 (already filled in throughout this file).
 2. Submit Builder Center PROJECT (SUBMIT-01) + POST (SUBMIT-02).
 3. Publish Dev.to (canonical_url set).
 4. LinkedIn: post the body, then immediately add the first comment with the 3 links.

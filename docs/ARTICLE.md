@@ -102,4 +102,5 @@ None of that changes the core result. Running the code and reading the real log 
 Everyone scans the repo. RepoPilot runs it, in a disposable AWS box, so your laptop does not.
 
 Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
+Demo video: https://youtu.be/cLT6oyAnO04
 Code: https://github.com/simplynadaf/repopilot-sandbox-tool

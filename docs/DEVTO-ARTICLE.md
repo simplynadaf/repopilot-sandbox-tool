@@ -100,6 +100,10 @@ The live demo is the real RepoPilot UI with the tool built in: inspect a repo (t
 
 {% embed https://github.com/simplynadaf/repopilot-sandbox-tool %}
 
+Watch the 2 minute before and after demo:
+
+{% embed https://youtu.be/cLT6oyAnO04 %}
+
 Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
 
 Everyone scans the repo. RepoPilot runs it, in a disposable AWS box, so your laptop does not.

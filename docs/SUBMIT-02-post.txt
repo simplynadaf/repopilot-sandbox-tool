@@ -26,6 +26,7 @@ Both runs were validated against live AWS CodeBuild. The agent reasons with Amaz
 The live demo is the real RepoPilot UI with the tool built in: inspect a repo (the safe `pallets/click` and the sneaky `evil/fake-agent-kit`), then hit "Run it in a disposable AWS sandbox" and watch it go from "looks fine" to "caught it" yourself.
 
 - Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
+- Demo video: https://youtu.be/cLT6oyAnO04
 - Code: https://github.com/simplynadaf/repopilot-sandbox-tool
 
 Everyone scans the repo. This agent runs it, in a disposable AWS box, so your laptop does not.
