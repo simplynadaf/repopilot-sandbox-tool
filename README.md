@@ -435,6 +435,7 @@ No. It is a static replay of real recorded runs, so it makes zero AWS calls.
 
 ## 🔗 Links
 
+- 🏗️ AWS Builder Center project: https://builder.aws.com/project/3L6g5QxJOXWAd6XGXxsHzvvxhQT/i-gave-my-ai-agent-one-new-tool-a-disposable-aws-sandbox-that-actually-runs-the-repo
 - ▶️ Demo video: https://youtu.be/cLT6oyAnO04
 - 🖥️ Live demo (the real UI, static replay): https://simplynadaf.github.io/repopilot-sandbox-tool/
 
