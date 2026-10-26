@@ -13,36 +13,45 @@ Unlisted or Public. If asked about altered/synthetic content: YES, synthetic voi
 (Amazon Polly). The footage is a real screen recording; only the narration is AI.
 
 ------------------------------------------------------------------- DESCRIPTION
-My agent used to judge a GitHub repo by reading it. I gave it one new tool and now it
+🧪 My AI agent used to judge a GitHub repo by reading it. I gave it one new tool and now it
 actually runs the install inside a disposable AWS CodeBuild sandbox, reads the real build
 log, and catches the postinstall hook a static scan never sees.
 
-Before (reads it): "Looks fine." After (runs it): "Caught it, the install piped
-curl | bash into a shell." Same agent, same repo, one new tool.
+⚠️ The dangerous moment is not when you read a repo. It is the second you run npm install, when
+a postinstall hook fires with your whole environment: your keys, your tokens.
 
-Built for the AWS Builder Center Weekend Challenge: Give your Agent a Tool.
-The agent reasons with Amazon Bedrock (Nova Pro) through the Strands Agents SDK; the new
-tool is backed by AWS CodeBuild with a least-privilege role. Both runs shown were
-validated against live AWS.
+🎚️ Before (reads it): "Looks fine."
+✅ After (runs it): "Caught it, the install piped curl | bash into a shell."
+Same agent, same repo, one new tool.
 
-Live demo (the real UI, static replay): https://simplynadaf.github.io/repopilot-sandbox-tool/
-Code (repo): https://github.com/simplynadaf/repopilot-sandbox-tool
+🏗️ Built for the AWS Builder Center Weekend Challenge: Give your Agent a Tool.
+🧠 The agent reasons with Amazon Bedrock (Nova Pro) through the Strands Agents SDK.
+☁️ The new tool is backed by AWS CodeBuild with a least-privilege role.
+🔒 The container is thrown away after every run, so the untrusted code runs in AWS, never on
+your laptop. Both runs shown were validated against live AWS.
 
-Chapters:
-0:00 The agent that only read the repo
-0:28 The gap: what runs when you npm install
-0:50 The new tool runs it in a disposable AWS sandbox
-1:25 A genuinely safe repo, verified
-1:45 It is real: the original agent + live AWS
-2:05 The reusable pattern and close
+🔗 Links
+🖥️ Live demo (the real UI, static replay): https://simplynadaf.github.io/repopilot-sandbox-tool/
+💻 Code (repo): https://github.com/simplynadaf/repopilot-sandbox-tool
 
-Follow me:
-Portfolio: https://sarvarnadaf.com
-GitHub: https://github.com/simplynadaf
-LinkedIn: https://www.linkedin.com/in/sarvar04/
-Dev.to: https://dev.to/sarvar_04
-AWS Builder Center: https://builder.aws.com/community/@sarvar
-X: https://x.com/SarvarN_04
+⏱️ Chapters:
+0:00 Intro
+0:07 The agent that only reads the repo
+0:31 The gap: what runs when you npm install
+0:58 The new tool runs it in a disposable AWS sandbox
+1:38 A genuinely safe repo, verified
+2:02 It is real: the original agent + live AWS
+2:18 Close
+
+🙋 Follow me:
+🌐 Portfolio: https://sarvarnadaf.com
+🐙 GitHub: https://github.com/simplynadaf
+💼 LinkedIn: https://www.linkedin.com/in/sarvar04/
+✍️ Dev.to: https://dev.to/sarvar_04
+🛠️ AWS Builder Center: https://builder.aws.com/community/@sarvar
+❎ X: https://x.com/SarvarN_04
+
+🎙️ Narration uses a synthetic voice (Amazon Polly). The screen recording is real.
 
 #awsagents #awsbuilder #aicoding #codebuild #bedrock #supplychainsecurity #strands
 
