@@ -1,5 +1,5 @@
 ================================================================================
-PROMOTION  —  RepoPilot sandbox tool  (AWS Builder Center weekend challenge)
+PROMOTION  -  RepoPilot sandbox tool  (AWS Builder Center weekend challenge)
 ================================================================================
 Fill YOUTUBE_URL after upload, then post. Hard rules: 0 em dashes. Link in first
 comment on LinkedIn (the algorithm suppresses posts with outbound links in the body).
@@ -7,7 +7,7 @@ comment on LinkedIn (the algorithm suppresses posts with outbound links in the b
 
 
 --------------------------------------------------------------------------------
-LINKEDIN  (post body — put the link in the FIRST COMMENT, not here)
+LINKEDIN  (post body - put the link in the FIRST COMMENT, not here)
 --------------------------------------------------------------------------------
 I built an agent that reads a GitHub repo and tells you if it is safe to run.
 
