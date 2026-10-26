@@ -4,8 +4,12 @@ published: false
 description: "Everyone detects npm supply-chain malware without running the code. I gave my AI agent one tool that runs the install in a disposable AWS CodeBuild sandbox and catches the postinstall curl | bash a static scan misses."
 tags: aws, ai, security, devops
 canonical_url: https://builder.aws.com/project/3L6g5QxJOXWAd6XGXxsHzvvxhQT/i-gave-my-ai-agent-one-new-tool-a-disposable-aws-sandbox-that-actually-runs-the-repo
-cover_image: https://raw.githubusercontent.com/simplynadaf/repopilot-sandbox-tool/main/docs/cover-devto.png
+cover_image: UPLOAD_IN_EDITOR
 ---
+<!-- Cover image: in the Dev.to editor, upload the 1000x420 cover directly
+     (docs/cover-devto in S3: repopilot-sandbox-tool/youtube/cover-devto-1000x420.png).
+     Do not point cover_image at a repo raw URL; the cover is a marketing asset,
+     kept out of the product repo. -->
 
 > This started as an AWS Builder Center weekend challenge: take an agent you already built, add one new tool, and show the before and after. Mine went from reading a repo to actually running it.
 
