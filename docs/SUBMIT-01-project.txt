@@ -7,7 +7,7 @@ Copy each field into the matching box. Upload the cover file. Done.
 I gave my AI agent one new tool: a disposable AWS sandbox that actually runs the repo
 
 ------------------------------------------------------------- DESCRIPTION (<=512)
-My agent used to judge a GitHub repo by reading it. I added one tool, run_in_sandbox, and now it runs the install inside a disposable AWS CodeBuild container and reports the real result, catching the postinstall hook a static scan never sees. Here is the before and after, the code, and a live toggle demo.
+My agent used to judge a GitHub repo by reading it. I added one tool, run_in_sandbox, and now it runs the install inside a disposable AWS CodeBuild container and reports the real result, catching the postinstall hook a static scan never sees. Here is the before and after, the code, and a live demo.
 
 --------------------------------------------------------------------------- TAGS
 aws
@@ -109,7 +109,7 @@ Running the code and reading the real log is a categorically better signal than 
 ## Try it
 
 - Code, tests, and the setup and teardown scripts are in the repo.
-- The live demo is a before and after toggle: flip v1 (reads it) and v2 (runs it) on a safe repo and a sneaky one, and watch the agent go from "looks fine" to "caught it." It is a static replay of real recorded runs, so it costs nothing to keep online.
+- The live demo is the real RepoPilot UI with the tool built in: inspect a repo (the safe `pallets/click` and the sneaky `evil/fake-agent-kit`), then hit "Run it in a disposable AWS sandbox" and watch the agent go from "looks fine" to "caught it." It is a static replay of real recorded runs, so it costs nothing to keep online.
 
 Everyone scans the repo. RepoPilot runs it, in a disposable AWS box, so your laptop does not.
 
