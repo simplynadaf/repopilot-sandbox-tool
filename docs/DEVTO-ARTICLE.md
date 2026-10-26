@@ -3,8 +3,8 @@ title: "Detecting supply-chain malware by actually running it: an AI agent + dis
 published: false
 description: "Everyone detects npm supply-chain malware without running the code. I gave my AI agent one tool that runs the install in a disposable AWS CodeBuild sandbox and catches the postinstall curl | bash a static scan misses."
 tags: aws, ai, security, devops
-canonical_url: https://sarvarnadaf.com/blog/repopilot-sandbox-tool
-cover_image:
+canonical_url: https://builder.aws.com/project/3L6g5QxJOXWAd6XGXxsHzvvxhQT/i-gave-my-ai-agent-one-new-tool-a-disposable-aws-sandbox-that-actually-runs-the-repo
+cover_image: https://raw.githubusercontent.com/simplynadaf/repopilot-sandbox-tool/main/docs/cover-devto.png
 ---
 
 > This started as an AWS Builder Center weekend challenge: take an agent you already built, add one new tool, and show the before and after. Mine went from reading a repo to actually running it.
@@ -104,7 +104,9 @@ Watch the 2 minute before and after demo:
 
 {% embed https://youtu.be/cLT6oyAnO04 %}
 
-Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
+Try the live playground yourself (static replay, zero cost): {% embed https://simplynadaf.github.io/repopilot-sandbox-tool/ %}
+
+This was built for the AWS Builder Center weekend challenge, Give your Agent a Tool: https://builder.aws.com/project/3L6g5QxJOXWAd6XGXxsHzvvxhQT/i-gave-my-ai-agent-one-new-tool-a-disposable-aws-sandbox-that-actually-runs-the-repo
 
 Everyone scans the repo. RepoPilot runs it, in a disposable AWS box, so your laptop does not.
 
