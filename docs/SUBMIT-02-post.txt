@@ -23,7 +23,7 @@ The new tool, `run_in_sandbox`, actually runs the install inside a disposable AW
 
 Both runs were validated against live AWS CodeBuild. The agent reasons with Amazon Bedrock (Nova Pro) through Strands; the new power is one Strands `@tool` backed by CodeBuild, with a least-privilege role and 9 offline unit tests.
 
-The live demo is a before/after toggle so you can flip v1 (reads it) and v2 (runs it) on a safe repo and a sneaky one yourself.
+The live demo is the real RepoPilot UI with the tool built in: inspect a repo (the safe `pallets/click` and the sneaky `evil/fake-agent-kit`), then hit "Run it in a disposable AWS sandbox" and watch it go from "looks fine" to "caught it" yourself.
 
 - Live demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
 - Code: https://github.com/simplynadaf/repopilot-sandbox-tool

@@ -3,10 +3,10 @@ YOUTUBE METADATA  (paste when uploading; add the real URL back into the other fi
 ================================================================================
 
 ------------------------------------------------------------------- TITLE (<=100)
-I gave my AI agent one new tool and it went from guessing to proving (AWS sandbox)
+My AI agent ran a malicious repo in an AWS sandbox and caught the curl | bash
 
-Alt A/B title (first-person viral):
-I gave my AI agent a disposable AWS sandbox and it caught a repo trying to curl | bash
+Alt A/B title (first-person, keyword-front):
+I gave my AI agent one new tool: an AWS sandbox that runs the repo so your laptop doesn't
 
 --------------------------------------------------------------------------- VISIBILITY
 Unlisted or Public. If asked about altered/synthetic content: YES, synthetic voice
@@ -25,7 +25,7 @@ The agent reasons with Amazon Bedrock (Nova Pro) through the Strands Agents SDK;
 tool is backed by AWS CodeBuild with a least-privilege role. Both runs shown were
 validated against live AWS.
 
-Live before/after toggle demo: https://simplynadaf.github.io/repopilot-sandbox-tool/
+Live demo (the real UI, static replay): https://simplynadaf.github.io/repopilot-sandbox-tool/
 Code (repo): https://github.com/simplynadaf/repopilot-sandbox-tool
 
 Chapters:

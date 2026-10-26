@@ -1,7 +1,7 @@
 ---
-title: "Stop scanning. Run it: I gave my AI agent a disposable AWS sandbox to vet any GitHub repo"
+title: "Detecting supply-chain malware by actually running it: an AI agent + disposable AWS sandbox"
 published: false
-description: "My agent judged a GitHub repo by reading it. I added one tool and now it runs the install in a disposable AWS CodeBuild sandbox and catches the postinstall a static scan misses."
+description: "Everyone detects npm supply-chain malware without running the code. I gave my AI agent one tool that runs the install in a disposable AWS CodeBuild sandbox and catches the postinstall curl | bash a static scan misses."
 tags: aws, ai, security, devops
 canonical_url: https://sarvarnadaf.com/blog/repopilot-sandbox-tool
 cover_image:
