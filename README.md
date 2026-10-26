@@ -377,7 +377,6 @@ repopilot-sandbox-tool/
 │   └── codebuild-permissions.json  # least-privilege: CloudWatch Logs only
 └── docs/
     ├── index.html                  # the real RepoPilot UI with the sandbox tool built in
-    ├── toggle.html                 # the earlier standalone before/after toggle (kept for reference)
     ├── architecture.png            # how it works: the static read + the new sandbox-tool pipeline
     ├── ui-hero.png                 # the UI catching a curl|bash in the live sandbox log
     └── replay-data.json            # real recorded run output for the static demo
