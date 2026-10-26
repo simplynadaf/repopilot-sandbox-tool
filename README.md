@@ -42,6 +42,7 @@
 - [Before / After (the whole point)](#-before--after-the-whole-point)
 - [Why Running Beats Scanning](#-why-running-beats-scanning)
 - [How the Tool Works](#-how-the-tool-works)
+- [How v2 plugs into AWS](#-how-v2-plugs-into-aws-the-environment)
 - [The Reusable Pattern](#-the-reusable-pattern)
 - [What It Catches (threat model)](#-what-it-catches)
 - [Tech Stack](#️-tech-stack)
@@ -172,6 +173,80 @@ Inside [`repopilot/sandbox.py`](repopilot/sandbox.py):
    configured, so it never dead-ends.
 
 One CodeBuild project serves every repo; the buildspec is overridden per run.
+
+---
+
+## ☁️ How v2 plugs into AWS (the environment)
+
+This is the part the challenge cares about: how the new tool is actually wired into AWS. The
+whole integration is one CodeBuild project and one least-privilege role, created by a single
+setup script and torn down by another. Nothing else is left running.
+
+### Resources the setup script creates
+
+`scripts/setup_sandbox.sh` provisions exactly three things in `us-east-1`:
+
+| Resource | Name | What it is |
+|---|---|---|
+| IAM role | `repopilot-sandbox-role` | CodeBuild assume-role; inline policy grants **CloudWatch Logs only** |
+| CodeBuild project | `repopilot-sandbox` | `amazonlinux2-x86_64-standard:5.0`, `BUILD_GENERAL1_SMALL`, `NO_SOURCE`, `NO_ARTIFACTS`, 10-minute timeout |
+| CloudWatch log group | `/aws/codebuild/repopilot-sandbox` | where the real build log is written and read back |
+
+The agent finds the project through one environment variable: `REPOPILOT_SANDBOX_PROJECT=repopilot-sandbox`.
+
+### What happens on every `run_in_sandbox` call
+
+```
+run_in_sandbox(repo, clone_url, install_cmd)
+   │
+   1. build_buildspec() -> base64-encoded "git clone --depth 1 + run install_cmd"
+   │
+   2. codebuild:StartBuild  (buildspecOverride = that spec, on the one project)
+   │        the ephemeral amazonlinux2 container spins up
+   │
+   3. poll codebuild:BatchGetBuilds every 5s until status != IN_PROGRESS (<=10 min)
+   │
+   4. logs:GetLogEvents from /aws/codebuild/repopilot-sandbox  -> the REAL build log
+   │
+   5. scan_log_for_danger(log) + summarize_build() -> JSON verdict back to the agent
+   │
+   6. the container is destroyed by CodeBuild; nothing persists
+```
+
+The project uses `NO_SOURCE` and the buildspec is overridden per run, so a single project
+serves any repo without reconfiguration.
+
+### The IAM boundary (why this is safe)
+
+The CodeBuild service role (`iam/codebuild-permissions.json`) grants **only**:
+
+```json
+{ "Effect": "Allow",
+  "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+  "Resource": "arn:aws:logs:*:*:log-group:/aws/codebuild/repopilot-sandbox*" }
+```
+
+The clone and the install step need no AWS permissions, so none are granted. Even if a repo's
+install is hostile, the container it runs in can touch nothing in the account except its own
+log stream. The untrusted code runs in AWS, never on your laptop.
+
+### Compute, cost, and region
+
+- Region: `us-east-1`. Compute: `BUILD_GENERAL1_SMALL` (the cheapest Linux tier).
+- Billing is per build minute, so a run costs a fraction of a cent. There is nothing
+  always-on: no Lambda warm pool, no idle cluster.
+- Teardown removes the project, the role policy, the role, and the log group:
+  ```bash
+  bash scripts/teardown_sandbox.sh
+  ```
+
+### The public demo makes zero AWS calls
+
+The hosted demo (`docs/index.html`, served by GitHub Pages) runs on **pre-recorded replay data
+only**. `LIVE_ENABLED` is `false` and the live endpoint is blanked, so the one `fetch` branch is
+unreachable and the Live button is hidden. No matter how many people open the site, it never
+calls AWS and never costs anything. The real live integration runs only from the author's own
+`ui/index.html` build against the account above.
 
 ---
 

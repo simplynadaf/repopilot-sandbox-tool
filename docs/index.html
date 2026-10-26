@@ -395,11 +395,12 @@
 
 <script>
   // ========================= CONFIG =========================
-  // The live API Gateway endpoint (fronts the Lambda + Amazon Nova Pro).
-  const ENDPOINT = "https://m46yt4455b.execute-api.us-east-1.amazonaws.com";
-  // Master switch for the Live option. After the demo is recorded, set this to false to
-  // ship a safe, cost-free public site that runs ONLY on pre-configured Demo data.
-  const LIVE_ENABLED = false;  // public demo: demo-data only, $0, no AWS calls
+  // PUBLIC DEMO BUILD: this site runs ONLY on pre-configured replay data. It makes
+  // zero network calls to AWS, so it costs nothing no matter how many people open it.
+  // The live endpoint is intentionally blanked here; the real endpoint lives only in
+  // the ui/index.html build used for the author's own live demo.
+  const ENDPOINT = "";          // blanked on purpose for the $0 public site
+  const LIVE_ENABLED = false;   // demo-data only; the fetch branch below is unreachable
   // ==========================================================
 
   const $ = (id) => document.getElementById(id);
