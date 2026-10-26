@@ -1,0 +1,33 @@
+RepoPilot Sandbox Tool - submission assets
+AWS Builder Center Weekend Challenge: Give your Agent a Tool
+Deadline: Mon Oct 26 2026, 1:00 PM PT (8:00 PM UTC) = ~1:30 AM IST Tue Oct 27
+
+LIVE LINKS
+  Demo video (YouTube):  https://youtu.be/cLT6oyAnO04
+  Live demo (Pages):     https://simplynadaf.github.io/repopilot-sandbox-tool/
+  Code (GitHub):         https://github.com/simplynadaf/repopilot-sandbox-tool
+
+FILES IN THIS FOLDER
+  repopilot-sandbox-demo.mp4     The final 2:25 demo video (1080p, H.264)
+  thumbnail-1280x720.png         YouTube thumbnail
+  cover-banner-1200x675.png      Builder Center project cover image
+  YOUTUBE-METADATA.md            Title, description (emojis), chapters, tags
+  SUBMIT-01-project.txt          PASTE into Builder Center "Create a project"
+  SUBMIT-02-post.txt             PASTE into Builder Center challenge "Create a post"
+  ARTICLE-buildercenter.md       Long-form article body (same as project body)
+  DEVTO-ARTICLE.md               PASTE into Dev.to (canonical_url set, video embedded)
+  PROMOTION.md                   LinkedIn + X + YouTube + Builder Center promo copy
+  README.md                      Repo README snapshot (hero + architecture + AWS section)
+  architecture.png               Architecture diagram (shows the new tool pipeline)
+  ui-hero.png                    UI screenshot catching curl|bash
+
+SUBMISSION ORDER
+  1. Builder Center -> Create a project: paste SUBMIT-01 fields. Cover = cover-banner.
+     Demo field = the YouTube link above. Submit.
+  2. Builder Center -> Create a post (challenge space): paste SUBMIT-02.
+  3. Dev.to: paste DEVTO-ARTICLE.md, publish (canonical set).
+  4. Promote: PROMOTION.md (LinkedIn body + links in first comment; X thread; YT post).
+
+OPEN DECISION
+  Confirm the "previously unpublished" framing before submitting (RepoPilot was
+  already published; this is framed as a NEW project centered on the new tool).
