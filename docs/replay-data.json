@@ -21,7 +21,7 @@
       }
     },
     "bad": {
-      "repo": "demo/sneaky-postinstall",
+      "repo": "evil/fake-agent-kit",
       "clone_url": "(a repo whose install hides a postinstall)",
       "install_cmd": "install step that reaches the network",
       "v1_static": {

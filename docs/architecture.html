@@ -3,122 +3,143 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RepoPilot: Architecture</title>
+<title>RepoPilot: Architecture (now with the sandbox tool)</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   html,body { margin:0; background:#f5f5f5; }
   body { font-family:'Geist',sans-serif; color:#2d3142; padding:28px 32px; }
-  .page { max-width:1000px; margin:0 auto; }
+  .page { max-width:1040px; margin:0 auto; }
   .eyebrow { font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:#7a6cff; margin:0; }
-  h1 { font-family:'Instrument Serif',serif; font-weight:400; font-size:1.75rem; margin:6px 0 2px; }
-  .sub { color:#4f5d75; font-size:.9rem; margin:0 0 16px; max-width:64ch; }
+  h1 { font-family:'Instrument Serif',serif; font-weight:400; font-size:1.8rem; margin:6px 0 2px; }
+  .sub { color:#4f5d75; font-size:.9rem; margin:0 0 16px; max-width:70ch; }
   svg { display:block; width:100%; height:auto; }
 </style>
 </head>
 <body>
 <div class="page">
-  <p class="eyebrow">RepoPilot · How It Works</p>
-  <h1>From a repo URL to a friendly first-run guide</h1>
-  <p class="sub">One Lambda function. The agent reads the real repo, runs seven tools and computes a 0-100 score, then asks Amazon Nova Pro to narrate one kind, ordered path.</p>
+  <p class="eyebrow">RepoPilot · How It Works · + the new tool</p>
+  <h1>From a repo URL to a verdict it actually proved</h1>
+  <p class="sub">RepoPilot reads the repo with 5 static tools and scores it 0-100 (the guess). The <strong>new 6th tool, <span style="color:#7a6cff">run_in_sandbox</span></strong>, then runs the install inside a disposable AWS CodeBuild container and reads the real log, so the agent stops guessing and starts proving.</p>
 
-  <svg viewBox="0 0 920 560" role="img" aria-labelledby="rp-arch-title rp-arch-desc" xmlns="http://www.w3.org/2000/svg">
-    <title id="rp-arch-title">RepoPilot architecture</title>
-    <desc id="rp-arch-desc">A new contributor sends a repo URL to a web UI or Lambda Function URL; the RepoPilot agent on AWS Lambda fetches the public GitHub repo, runs five analysis tools, calls Amazon Nova Pro on Amazon Bedrock to narrate the result, and returns a friendly first-run guide.</desc>
+  <svg viewBox="0 0 960 600" role="img" aria-labelledby="rp-arch-title rp-arch-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="rp-arch-title">RepoPilot architecture with the sandbox tool</title>
+    <desc id="rp-arch-desc">A contributor sends a repo URL to the RepoPilot agent (Strands + Amazon Bedrock Nova Pro). Five static read-tools produce a 0-100 score (the guess). The new sixth tool, run_in_sandbox, starts an ephemeral AWS CodeBuild build with a least-privilege role that clones the repo and runs its install, writes the real log to CloudWatch, and a danger scan over that real log produces the proven verdict.</desc>
 
     <defs>
       <marker id="a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
       <marker id="ap" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7a6cff"/></marker>
+      <marker id="an" markerWidth="9" markerHeight="7" refX="7.5" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#d9480f"/></marker>
+      <linearGradient id="newg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#8b7cff"/><stop offset="1" stop-color="#6d5ef0"/>
+      </linearGradient>
     </defs>
 
-    <rect width="920" height="560" fill="#f5f5f5"/>
+    <rect width="960" height="600" fill="#f5f5f5"/>
 
-    <!-- ============ ROW 1: the request flow (y ~ 60-120) ============ -->
-    <!-- connectors first -->
-    <!-- user -> UI -->
+    <!-- ============ ROW 1: request + agent (y ~ 56-128) ============ -->
     <path d="M 196 92 H 268" stroke="#4f5d75" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
     <rect x="206" y="72" width="56" height="12" rx="2" fill="#f5f5f5"/>
     <text x="234" y="81" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">REPO URL</text>
-    <!-- UI -> Lambda -->
     <path d="M 404 92 H 476" stroke="#7a6cff" stroke-width="1.6" fill="none" marker-end="url(#ap)"/>
     <rect x="420" y="72" width="40" height="12" rx="2" fill="#f5f5f5"/>
-    <text x="440" y="81" fill="#7a6cff" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">POST</text>
+    <text x="440" y="81" fill="#7a6cff" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">ASK</text>
 
-    <!-- user node -->
+    <!-- user -->
     <rect x="56" y="64" width="140" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399"/>
-    <text x="126" y="88" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">🧑 New contributor</text>
-    <text x="126" y="106" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">"get this running"</text>
+    <text x="126" y="88" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">🧑 You</text>
+    <text x="126" y="106" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">"is this safe to run?"</text>
 
-    <!-- UI node -->
+    <!-- UI -->
     <rect x="268" y="64" width="136" height="56" rx="6" fill="#ffffff" stroke="#2d3142"/>
-    <rect x="276" y="70" width="48" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.4)" stroke-width=".8"/>
-    <text x="300" y="79" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">HTTPS</text>
-    <text x="336" y="98" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">UI / Function URL</text>
-    <text x="336" y="113" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">GitHub Pages demo</text>
+    <text x="336" y="90" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">UI / Function URL</text>
+    <text x="336" y="107" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">scorecard + run button</text>
 
-    <!-- Lambda node (focal) -->
-    <rect x="476" y="56" width="268" height="72" rx="8" fill="rgba(122,108,255,0.08)" stroke="#7a6cff" stroke-width="1.2"/>
-    <rect x="486" y="64" width="78" height="13" rx="2" fill="transparent" stroke="rgba(122,108,255,0.5)" stroke-width=".8"/>
-    <text x="525" y="74" fill="#5a4ad1" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">AWS LAMBDA</text>
-    <text x="610" y="98" fill="#2d3142" font-size="13" font-weight="600" text-anchor="middle">RepoPilot agent (py3.12)</text>
-    <text x="610" y="115" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">fetch · score · narrate · reply</text>
+    <!-- Agent (focal) -->
+    <rect x="476" y="56" width="284" height="72" rx="8" fill="rgba(122,108,255,0.08)" stroke="#7a6cff" stroke-width="1.2"/>
+    <rect x="486" y="64" width="150" height="13" rx="2" fill="transparent" stroke="rgba(122,108,255,0.5)" stroke-width=".8"/>
+    <text x="561" y="74" fill="#5a4ad1" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">STRANDS AGENT · AWS LAMBDA</text>
+    <text x="618" y="98" fill="#2d3142" font-size="13" font-weight="600" text-anchor="middle">RepoPilot agent</text>
+    <text x="618" y="115" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">6 tools · reason with Nova Pro</text>
 
-    <!-- ============ ROW 2: downstream (y ~ 200-440) ============ -->
-    <!-- Lambda -> GitHub (down-left elbow) -->
-    <path d="M 540 128 V 170 Q 540 178 532 178 H 206 Q 198 178 198 186 V 212" stroke="#4f5d75" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
-    <rect x="300" y="172" width="90" height="12" rx="2" fill="#f5f5f5"/>
-    <text x="345" y="181" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">FETCH REPO</text>
+    <!-- Bedrock (right) -->
+    <path d="M 760 92 H 824" stroke="#7a6cff" stroke-width="1.6" fill="none" marker-end="url(#ap)"/>
+    <rect x="824" y="64" width="128" height="56" rx="6" fill="rgba(122,108,255,0.08)" stroke="#7a6cff"/>
+    <text x="888" y="88" fill="#2d3142" font-size="11.5" font-weight="600" text-anchor="middle">🧠 Bedrock</text>
+    <text x="888" y="105" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">Nova Pro</text>
 
-    <!-- Lambda -> Tools (straight down) -->
-    <path d="M 610 128 V 212" stroke="#4f5d75" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
-    <rect x="572" y="162" width="76" height="12" rx="2" fill="#f5f5f5"/>
-    <text x="610" y="171" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">RUN TOOLS</text>
+    <!-- ============ ROW 2: the two tool lanes ============ -->
+    <!-- agent -> static tools -->
+    <path d="M 560 128 V 180 Q 560 188 552 188 H 330 Q 322 188 322 196 V 214" stroke="#4f5d75" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+    <rect x="356" y="182" width="120" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="416" y="191" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">v1 · READ (the guess)</text>
 
-    <!-- Lambda -> Bedrock (down-right elbow) -->
-    <path d="M 700 128 V 170 Q 700 178 708 178 H 820 Q 828 178 828 186 V 212" stroke="#7a6cff" stroke-width="1.6" fill="none" marker-end="url(#ap)"/>
-    <rect x="748" y="172" width="70" height="12" rx="2" fill="#f5f5f5"/>
-    <text x="783" y="181" fill="#7a6cff" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">NARRATE</text>
+    <!-- agent -> NEW tool (bold purple) -->
+    <path d="M 676 128 V 180 Q 676 188 684 188 H 724 Q 732 188 732 196 V 214" stroke="url(#newg)" stroke-width="2.4" fill="none" marker-end="url(#ap)"/>
+    <rect x="636" y="182" width="166" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="719" y="191" fill="#5a4ad1" font-size="8" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".04em">v2 · RUN IT ★ NEW TOOL</text>
 
-    <!-- GitHub node -->
-    <rect x="118" y="212" width="160" height="56" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)"/>
-    <text x="198" y="236" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">🐙 Public GitHub</text>
-    <text x="198" y="254" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">tree · README · manifests</text>
+    <!-- LANE A: static read tools -->
+    <rect x="96" y="214" width="372" height="214" rx="8" fill="#ffffff" stroke="#2d3142"/>
+    <rect x="106" y="222" width="190" height="13" rx="2" fill="transparent" stroke="rgba(45,49,66,0.4)" stroke-width=".8"/>
+    <text x="201" y="232" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">5 STATIC TOOLS → 0-100 SCORE</text>
+    <text x="116" y="256" fill="#2d3142" font-size="11">1 · assess_repo_trust</text>
+    <text x="116" y="278" fill="#2d3142" font-size="11">2 · scan_setup_for_danger  <tspan fill="#7a8399" font-size="9">(reads README)</tspan></text>
+    <text x="116" y="300" fill="#2d3142" font-size="11">3 · build_first_run_plan</text>
+    <text x="116" y="322" fill="#2d3142" font-size="11">4 · check_readme_against_reality</text>
+    <text x="116" y="344" fill="#2d3142" font-size="11">5 · preflight_requirements</text>
+    <rect x="106" y="360" width="352" height="56" rx="6" fill="rgba(79,93,117,0.05)" stroke="rgba(45,49,66,0.18)"/>
+    <text x="116" y="380" fill="#4f5d75" font-size="9.5" font-family="'Geist Mono',monospace">verdict basis: what the repo SAYS about itself</text>
+    <text x="116" y="398" fill="#b4541a" font-size="10" font-weight="600">⚠ a postinstall hook stays invisible here</text>
 
-    <!-- Tools node -->
-    <rect x="440" y="212" width="340" height="206" rx="8" fill="#ffffff" stroke="#2d3142"/>
-    <rect x="450" y="220" width="128" height="13" rx="2" fill="transparent" stroke="rgba(45,49,66,0.4)" stroke-width=".8"/>
-    <text x="514" y="230" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">7 TOOLS → 0-100 SCORE</text>
-    <text x="460" y="252" fill="#5a4ad1" font-size="11" font-weight="600">1 · assess_repo_trust</text>
-    <text x="460" y="272" fill="#5a4ad1" font-size="11" font-weight="600">2 · scan_setup_for_danger</text>
-    <text x="460" y="292" fill="#2d3142" font-size="11">3 · build_first_run_plan</text>
-    <text x="460" y="312" fill="#2d3142" font-size="11">4 · check_readme_against_reality</text>
-    <text x="460" y="332" fill="#2d3142" font-size="11">5 · generate_env_example</text>
-    <text x="460" y="352" fill="#2d3142" font-size="11">6 · preflight_requirements</text>
-    <text x="460" y="372" fill="#5a4ad1" font-size="11" font-weight="600">7 · explain_error  ★ the delight</text>
-    <text x="460" y="398" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">weighted → Safety·Trust·Maint·Maturity·Docs</text>
+    <!-- LANE B: THE NEW TOOL pipeline -->
+    <rect x="496" y="214" width="408" height="214" rx="10" fill="rgba(122,108,255,0.06)" stroke="#7a6cff" stroke-width="1.6"/>
+    <rect x="506" y="222" width="180" height="14" rx="2" fill="url(#newg)"/>
+    <text x="596" y="232.5" fill="#ffffff" font-size="7.5" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">★ NEW TOOL · run_in_sandbox</text>
 
-    <!-- Bedrock node -->
-    <rect x="748" y="212" width="160" height="56" rx="6" fill="rgba(122,108,255,0.08)" stroke="#7a6cff"/>
-    <text x="828" y="236" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">🧠 Amazon Bedrock</text>
-    <text x="828" y="254" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">Nova Pro</text>
+    <!-- step 1: CodeBuild -->
+    <rect x="516" y="250" width="176" height="60" rx="7" fill="rgba(122,108,255,0.10)" stroke="#7a6cff"/>
+    <text x="604" y="272" fill="#2d3142" font-size="11.5" font-weight="600" text-anchor="middle">☁️ AWS CodeBuild</text>
+    <text x="604" y="289" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">ephemeral container</text>
+    <text x="604" y="302" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">clone + run install · short TTL</text>
 
-    <!-- reply: Lambda back to user (dashed, clean down-and-left under row 1) -->
-    <path d="M 476 110 H 440 Q 432 110 432 118 V 140 Q 432 148 424 148 L 40 148 Q 32 148 32 140 V 100 Q 32 92 40 92 L 54 92" stroke="#4f5d75" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#a)"/>
-    <rect x="150" y="142" width="128" height="12" rx="2" fill="#f5f5f5"/>
-    <text x="214" y="151" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">↩ FRIENDLY GUIDE</text>
+    <!-- arrow cb -> logs -->
+    <path d="M 692 280 H 716" stroke="#7a6cff" stroke-width="1.6" fill="none" marker-end="url(#ap)"/>
+    <!-- step 2: CloudWatch -->
+    <rect x="716" y="250" width="172" height="60" rx="7" fill="rgba(122,108,255,0.10)" stroke="#7a6cff"/>
+    <text x="802" y="272" fill="#2d3142" font-size="11.5" font-weight="600" text-anchor="middle">📜 CloudWatch Logs</text>
+    <text x="802" y="289" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">the REAL build log</text>
+    <text x="802" y="302" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">(what actually ran)</text>
+
+    <!-- arrow down to scan -->
+    <path d="M 802 310 V 334" stroke="#d9480f" stroke-width="1.8" fill="none" marker-end="url(#an)"/>
+    <!-- step 3: danger scan -->
+    <rect x="516" y="334" width="372" height="80" rx="8" fill="rgba(217,72,15,0.06)" stroke="#d9480f" stroke-width="1.2"/>
+    <text x="528" y="354" fill="#b4541a" font-size="10.5" font-weight="600" font-family="'Geist Mono',monospace">scan_log_for_danger → summarize_build</text>
+    <text x="528" y="372" fill="#2d3142" font-size="10">curl|bash · remote eval · chmod+run · destructive sudo</text>
+    <text x="528" y="392" fill="#166534" font-size="10.5" font-weight="600">✓ proven verdict: install ok / caught the real danger</text>
+    <text x="528" y="408" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace">verdict basis: what the repo actually DID</text>
+
+    <!-- reply back to user (dashed) -->
+    <path d="M 476 104 H 452 Q 444 104 444 112 V 140 Q 444 148 436 148 L 40 148 Q 32 148 32 140 V 100 Q 32 92 40 92 L 54 92" stroke="#4f5d75" stroke-width="1.2" fill="none" stroke-dasharray="4,3" marker-end="url(#a)"/>
+    <rect x="150" y="142" width="150" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="225" y="151" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".06em">↩ GUESS, THEN PROOF</text>
+
+    <!-- IAM note under CodeBuild lane -->
+    <text x="700" y="446" fill="#4f5d75" font-size="8.5" font-family="'Geist Mono',monospace" text-anchor="middle">least-privilege role · CloudWatch-Logs-only · torn down after</text>
 
     <!-- ============ legend ============ -->
-    <line x1="56" y1="448" x2="864" y2="448" stroke="rgba(45,49,66,0.10)" stroke-width=".8"/>
-    <text x="56" y="468" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".14em">LEGEND</text>
-    <rect x="130" y="460" width="10" height="10" rx="2" fill="rgba(122,108,255,0.08)" stroke="#7a6cff"/>
-    <text x="146" y="468" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">AWS service</text>
-    <rect x="268" y="460" width="10" height="10" rx="2" fill="#ffffff" stroke="#2d3142"/>
-    <text x="284" y="468" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">agent / code</text>
-    <rect x="420" y="460" width="10" height="10" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)"/>
-    <text x="436" y="468" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">external</text>
-    <line x1="548" y1="465" x2="578" y2="465" stroke="#7a6cff" stroke-width="1.6"/>
-    <text x="586" y="468" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">model / HTTPS path</text>
-    <line x1="720" y1="465" x2="750" y2="465" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3"/>
-    <text x="758" y="468" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">reply</text>
+    <line x1="56" y1="470" x2="904" y2="470" stroke="rgba(45,49,66,0.10)" stroke-width=".8"/>
+    <text x="56" y="490" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".14em">LEGEND</text>
+    <rect x="130" y="482" width="10" height="10" rx="2" fill="rgba(122,108,255,0.08)" stroke="#7a6cff"/>
+    <text x="146" y="490" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">AWS service</text>
+    <rect x="268" y="482" width="10" height="10" rx="2" fill="#ffffff" stroke="#2d3142"/>
+    <text x="284" y="490" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">agent / code</text>
+    <rect x="410" y="482" width="10" height="10" rx="2" fill="url(#newg)"/>
+    <text x="426" y="490" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">★ the new tool</text>
+    <line x1="548" y1="487" x2="578" y2="487" stroke="#d9480f" stroke-width="1.8"/>
+    <text x="586" y="490" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">danger scan (real log)</text>
+    <line x1="730" y1="487" x2="760" y2="487" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3"/>
+    <text x="768" y="490" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace">reply</text>
   </svg>
 </div>
 </body>
